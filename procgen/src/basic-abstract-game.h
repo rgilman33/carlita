@@ -49,7 +49,8 @@ class BasicAbstractGame : public Game {
     virtual void draw_grid_obj(QPainter &p, const QRectF &rect, int type, int theme);
     virtual void choose_world_dim();
     virtual bool should_draw_entity(const std::shared_ptr<Entity> &entity);
-    virtual void set_action_xy(int move_action);
+    //virtual void set_action_xy(int move_action); //RG added below but keeping this in so code doesn't break
+    virtual void set_action_xy(float move_action);
     virtual void choose_center(float &cx, float &cy);
     virtual void update_agent_velocity();
     virtual QRectF get_adjusted_image_rect(int type, const QRectF &rect);
@@ -127,9 +128,13 @@ class BasicAbstractGame : public Game {
     float bg_pct_x = 0.0f;
 
     float char_dim = 0.0f;
-    int last_move_action = 0;
-    int move_action = 0;
-    int special_action = 0;
+    // int last_move_action = 0;
+    // int move_action = 0;
+    // int special_action = 0; rg
+    float last_move_action = .0;
+    float move_action = .0;
+    float special_action = .0;
+
     float mixrate = 0.0f;
     float maxspeed = 0.0f;
     float max_jump = 0.0f;

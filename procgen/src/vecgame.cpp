@@ -57,7 +57,8 @@ int libenv_get_tensortypes(libenv_env *handle, enum libenv_space_name name, stru
     } else if (name == LIBENV_SPACE_ACTION) {
         types = venv->action_types;
         fassert(types.size() == 1);
-        fassert(types[0].dtype == LIBENV_DTYPE_INT32);
+        //fassert(types[0].dtype == LIBENV_DTYPE_INT32); RG
+        fassert(types[0].dtype == LIBENV_DTYPE_FLOAT32);
     } else if (name == LIBENV_SPACE_INFO) {
         types = venv->info_types;
     } else {
@@ -205,7 +206,7 @@ VecGame::VecGame(int _nenvs, VecOptions opts) {
     }
 
     fassert(env_name != "");
-    fassert(num_actions > 0);
+    //fassert(num_actions > 0); RG
     fassert(num_levels >= 0);
     fassert(start_level >= 0);
 
@@ -223,14 +224,25 @@ VecGame::VecGame(int _nenvs, VecOptions opts) {
         observation_types.push_back(s);
     }
 
+    // {
+    //     struct libenv_tensortype s;
+    //     strcpy(s.name, "action");
+    //     s.scalar_type = LIBENV_SCALAR_TYPE_DISCRETE;
+    //     s.dtype = LIBENV_DTYPE_INT32;
+    //     s.ndim = 0;
+    //     s.low.int32 = 0;
+    //     s.high.int32 = num_actions - 1;
+    //     action_types.push_back(s);
+    // }// changing action space to continuous
+
     {
         struct libenv_tensortype s;
         strcpy(s.name, "action");
-        s.scalar_type = LIBENV_SCALAR_TYPE_DISCRETE;
-        s.dtype = LIBENV_DTYPE_INT32;
+        s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
         s.ndim = 0;
-        s.low.int32 = 0;
-        s.high.int32 = num_actions - 1;
+        s.low.float32 = 0.f;
+        s.high.float32 = 100.f;
         action_types.push_back(s);
     }
 
@@ -264,6 +276,17 @@ VecGame::VecGame(int _nenvs, VecOptions opts) {
         s.ndim = 0,
         s.low.int32 = 0;
         s.high.int32 = INT32_MAX;
+        info_types.push_back(s);
+    }
+
+    {
+        struct libenv_tensortype s;
+        strcpy(s.name, "autopilot_steer");
+        s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
+        s.ndim = 0,
+        s.low.float32 = 0.f;
+        s.high.float32 = 100.f;
         info_types.push_back(s);
     }
     
@@ -337,7 +360,8 @@ void VecGame::set_buffers(const std::vector<std::vector<void *>> &ac, const std:
         for (int e = 0; e < num_envs; e++) {
             const auto &game = games[e];
             // we only ever have one action
-            game->action_ptr = (int32_t *)(ac[e][0]);
+            //game->action_ptr = (int32_t *)(ac[e][0]); RG
+            game->action_ptr = (float_t *)(ac[e][0]);
             game->obs_bufs = ob[e];
             game->info_bufs = info[e];
             game->reward_ptr = &rew[e];

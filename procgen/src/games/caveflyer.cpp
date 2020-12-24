@@ -141,6 +141,24 @@ class CaveFlyerGame : public BasicAbstractGame {
         main_width = world_dim;
         main_height = world_dim;
     }
+    
+    // void game_draw(QPainter &painter, const QRect &rect) override {
+
+    //     float rot = agent->rotation; // * 57.3;
+    //     std::cout << " Rotation " << rot;
+    //     float d = 512;
+    //     float n = (d/2) * sqrt(2);
+    //     float a = sqrt(2*pow(n,2) - (2*(n*n*cos(rot))));
+
+    //     float dx = a/2;
+    //     float dy = a * sqrt(3)/2;
+        
+    //     //std::cout << "  dx " << dx << "dy " << dy;
+    //     //painter.rotate(rot);
+    //     //painter.translate(dx/2,-dy/2);
+    //     BasicAbstractGame::game_draw(painter, rect);
+
+    // }
 
     void game_reset() override {
         BasicAbstractGame::game_reset();

@@ -136,7 +136,7 @@ class BossfightGame : public BasicAbstractGame {
 
                     float theta = PI * (1.25 + .5 * rand_pct);
                     src->vy = PLAYER_BULLET_VEL * sin(theta) * .5;
-                    src->vx = PLAYER_BULLET_VEL * cos(theta) * .5;
+                    src->vx = PLAYER_BULLET_VEL * (theta) * .5;
                     src->expire_time = 4;
                     src->life_time = 0;
                     src->alpha_decay = 0.8f;

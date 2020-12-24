@@ -35,8 +35,11 @@ BasicAbstractGame::BasicAbstractGame(std::string name)
     // only used by a few games
     max_jump = maxspeed;
 
-    default_action = 4;
-    last_move_action = 7;
+    // default_action = 4;
+    // last_move_action = 7; rg
+    default_action = .0;
+    last_move_action = .0;
+
     bg_tile_ratio = 0;
 
     main_bg_images_ptr = 0;
@@ -57,6 +60,7 @@ void BasicAbstractGame::game_init() {
     }
 
     if (main_bg_images_ptr == nullptr) {
+    //if (true) {
         main_bg_images_ptr = new std::vector<std::shared_ptr<QImage>>();
         use_procgen_background = true;
         auto main_bg_image = std::make_shared<QImage>(500, 500, QImage::Format_RGB32);
@@ -655,11 +659,18 @@ void BasicAbstractGame::basic_step_object(const std::shared_ptr<Entity> &obj) {
     obj->vy *= vy_pct;
 }
 
-void BasicAbstractGame::set_action_xy(int move_act) {
-    action_vx = move_act / 3 - 1;
-    action_vy = move_act % 3 - 1;
-    action_vrot = 0;
+// RG real values for av
+// void BasicAbstractGame::set_action_xy(int move_act) {
+//     action_vx = move_act / 3 - 1;
+//     action_vy = move_act % 3 - 1;
+//     action_vrot = 0;
+// }
+void BasicAbstractGame::set_action_xy(float move_act) {
+    action_vx = move_act;
+    action_vy = move_act;
+    action_vrot = move_act;
 }
+
 
 void BasicAbstractGame::choose_center(float &cx, float &cy) {
     cx = agent->x;
@@ -685,24 +696,26 @@ void BasicAbstractGame::decay_agent_velocity() {
 
 void BasicAbstractGame::game_step() {
     step_rand_int = rand_gen.randint(0, 1000000);
-    move_action = action % 9;
-    special_action = 0;
+    // move_action = action % 9;
+    // special_action = 0;
 
-    if (action >= 9) {
-        special_action = action - 8;
-        move_action = 4; // stand still when taking a special action
-    }
+    // if (action >= 9) {
+    //     special_action = action - 8;
+    //     move_action = 4; // stand still when taking a special action
+    // }
 
-    if (move_action != 4) {
-        last_move_action = move_action;
-    }
+    // if (move_action != 4) {
+    //     last_move_action = move_action;
+    // } rg
+    move_action = action;
 
     // set reasonable defaults
     action_vrot = 0;
     action_vx = 0;
     action_vy = 0;
 
-    set_action_xy(move_action);
+    // set_action_xy(move_action); rg
+    set_action_xy(.0f);
 
     if (grid_step) {
         agent->vx = action_vx;
@@ -759,11 +772,14 @@ void BasicAbstractGame::game_reset() {
     choose_world_dim();
     fassert(main_width > 0 && main_height > 0);
 
-    bg_pct_x = rand_gen.rand01();
+    // This determines playable background bounding location on top of the background image
+    // The entire game happens within this fenced 'main' area. 
+    bg_pct_x = .0f; //.3f; //rand_gen.rand01();
 
     grid_size = main_width * main_height;
     grid.resize(main_width, main_height);
 
+    // The background img to use
     background_index = rand_gen.randn((int)(main_bg_images_ptr->size()));
 
     AssetGen bggen(&rand_gen);
@@ -777,13 +793,15 @@ void BasicAbstractGame::game_reset() {
     float ax, ay;
     float a_r = 0.4f;
 
-    if (random_agent_start) {
-        ax = rand_gen.rand01() * (main_width - 2 * a_r) + a_r;
-        ay = rand_gen.rand01() * (main_height - 2 * a_r) + a_r;
-    } else {
-        ax = a_r;
-        ay = a_r;
-    }
+    // if (random_agent_start) {
+    //     ax = rand_gen.rand01() * (main_width - 2 * a_r) + a_r;
+    //     ay = rand_gen.rand01() * (main_height - 2 * a_r) + a_r;
+    // } else {
+    //     ax = a_r;
+    //     ay = a_r;
+    // }
+    ax = 6; // These obeys normal placement as does the other fish. Coordinates within the main width, height space
+    ay = 6; // 
 
     auto _agent = std::make_shared<Entity>(ax, ay, 0, 0, a_r, PLAYER);
     agent = _agent;
@@ -821,7 +839,7 @@ void BasicAbstractGame::prepare_for_drawing(float rect_height) {
     center_y = main_height * .5;
 
     if (options.center_agent) {
-        choose_center(center_x, center_y);
+        choose_center(center_x, center_y); // This would override the values set above (?)
     } else {
         visibility = main_width > main_height ? main_width : main_height;
         if (visibility < min_visibility)
@@ -887,6 +905,7 @@ void BasicAbstractGame::draw_image(QPainter &p, QRectF &base_rect, float rotatio
         int img_idx = img_type + theme * MAX_ASSETS;
         fassert(theme < MAX_IMAGE_THEMES);
 
+        // This does nothing, it's just the base_rect, which for fish is the result of get_screen_rect
         QRectF adjusted_rect = get_adjusted_image_rect(img_type, base_rect);
 
         auto asset_ptr = lookup_asset(img_idx, is_reflected);
@@ -897,13 +916,20 @@ void BasicAbstractGame::draw_image(QPainter &p, QRectF &base_rect, float rotatio
         }
 
         if (rotation == 0) {
+            // This draws each of our fish
             tile_image(p, asset_ptr, adjusted_rect, tile_ratio);
         } else {
             p.save();
+            // This is what sticks them to the background rather than on the window pane
+            // adj rect dims are always changing to match up, give appearance of being stuck to the background.
+            // If hardcode the translation it will just be stuck on the window pane at that location
+            // So adjusted rect is referencing our current window pane. We're always translating to 
+            // the middle (?) of the current window pane
             p.translate(adjusted_rect.x() + adjusted_rect.width() / 2, adjusted_rect.y() + adjusted_rect.height() / 2);
             p.rotate(rotation * 180 / PI);
             p.drawImage(QRectF(-adjusted_rect.width() / 2, -adjusted_rect.height() / 2, adjusted_rect.width(), adjusted_rect.height()), *asset_ptr);
             p.restore();
+            //std::cout << "\n\n x " << adjusted_rect.x() << "   y " << adjusted_rect.y() << "   w " << adjusted_rect.width() << "   h " << adjusted_rect.height();
         }
 
         if (alpha != 1) {
@@ -938,6 +964,7 @@ void BasicAbstractGame::draw_foreground(QPainter &p, const QRect &rect) {
         high_y = main_height - 1;
     }
 
+    // Doesn't affect our game
     for (int x = low_x; x <= high_x; x++) {
         for (int y = low_y; y <= high_y; y++) {
             int type = get_obj(x, y);
@@ -998,11 +1025,14 @@ void BasicAbstractGame::draw_background(QPainter &p, const QRect &rect) {
 
         float world_ar = main_width * 1.0 / main_height;
 
-        float extra_w = bg_ar - world_ar;
-        float offset_x = bg_pct_x * extra_w;
+        float extra_w = bg_ar - world_ar; // Extra space in the width for more variability opportunities
+        float offset_x = bg_pct_x * extra_w; 
+        // std::cout << "offset x " << offset_x; .35
 
+        // Simply drawing main_rect without adjust_rect step results in the bg img being warped to
+        // fit the main space dimensions rather than overlap behind.
         QRectF bg_rect = adjust_rect(main_rect, QRectF(-offset_x, 0, bg_ar / world_ar, 1));
-        p.drawImage(bg_rect, *background_image);
+        p.drawImage(bg_rect, *background_image); // This draws the background
     }
 }
 
@@ -1051,7 +1081,7 @@ bool BasicAbstractGame::should_draw_entity(const std::shared_ptr<Entity> &entity
 
 void BasicAbstractGame::draw_entity(QPainter &p, const std::shared_ptr<Entity> &ent) {
     if (should_draw_entity(ent)) {
-        QRectF r1 = get_object_rect(ent);
+        QRectF r1 = get_object_rect(ent); // this returns get_screen_rect() for the fish
         float tile_ratio = get_tile_aspect_ratio(ent);
         draw_image(p, r1, ent->rotation, ent->is_reflected, ent->image_type, ent->image_theme, ent->alpha, tile_ratio);
     }
@@ -1188,9 +1218,14 @@ void BasicAbstractGame::serialize(WriteBuffer *b) {
     b->write_float(bg_pct_x);
 
     b->write_float(char_dim);
-    b->write_int(last_move_action);
-    b->write_int(move_action);
-    b->write_int(special_action);
+    
+    // b->write_int(last_move_action);
+    // b->write_int(move_action);
+    // b->write_int(special_action); rg
+    b->write_float(last_move_action);
+    b->write_float(move_action);
+    b->write_float(special_action);
+
     b->write_float(mixrate);
     b->write_float(maxspeed);
     b->write_float(max_jump);
@@ -1253,9 +1288,14 @@ void BasicAbstractGame::deserialize(ReadBuffer *b) {
     bg_pct_x = b->read_float();
 
     char_dim = b->read_float();
-    last_move_action = b->read_int();
-    move_action = b->read_int();
-    special_action = b->read_int();
+
+    // last_move_action = b->read_int();
+    // move_action = b->read_int();
+    // special_action = b->read_int(); rg
+    last_move_action = b->read_float();
+    move_action = b->read_float();
+    special_action = b->read_float();
+
     mixrate = b->read_float();
     maxspeed = b->read_float();
     max_jump = b->read_float();

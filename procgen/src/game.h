@@ -77,7 +77,8 @@ class Game {
     RandGen rand_gen;
 
     StepData step_data;
-    int action = 0;
+    //int action = 0; RG
+    float action = .0;
 
     int timeout = 0;
 
@@ -88,7 +89,8 @@ class Game {
 
     int last_reward_timer = 0;
     float last_reward = 0.0f;
-    int default_action = 0;
+    //int default_action = 0; rg
+    float default_action = .0;
 
     int fixed_asset_seed = 0;
 
@@ -99,7 +101,8 @@ class Game {
     bool is_waiting_for_step = false;
 
     // pointers to buffers
-    int32_t *action_ptr;
+    //int32_t *action_ptr; RG
+    float_t *action_ptr;
     std::vector<void *> obs_bufs;
     std::vector<void *> info_bufs;
     float *reward_ptr = nullptr;

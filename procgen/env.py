@@ -28,6 +28,7 @@ ENV_NAMES = [
     "ninja",
     "plunder",
     "starpilot",
+    "testgame",
 ]
 
 EXPLORATION_LEVEL_SEEDS = {
@@ -197,7 +198,8 @@ class BaseProcgenEnv(CEnv):
     def act(self, ac):
         # tensorflow may return int64 actions (https://github.com/openai/gym/blob/master/gym/spaces/discrete.py#L13)
         # so always cast actions to int32
-        return super().act({"action": ac.astype(np.int32)})
+        #return super().act({"action": ac.astype(np.int32)})
+        return super().act({"action": ac.astype(np.float32)})
 
 
 class ProcgenGym3Env(BaseProcgenEnv):
