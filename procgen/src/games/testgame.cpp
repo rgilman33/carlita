@@ -822,7 +822,7 @@ class TestGame : public BasicAbstractGame {
         *(float_t *)(info_bufs[info_name_to_offset.at("current_speed")]) = (float) std::clamp(current_speed, -5.f, 5.f);
         *(float_t *)(info_bufs[info_name_to_offset.at("dv")]) = (float) dv;
 
-        *(float_t *)(info_bufs[info_name_to_offset.at("front_angle")]) = (float) front_angle;
+        *(float_t *)(info_bufs[info_name_to_offset.at("front_angle")]) = (float) (front_angle / 10.f); // making it less important in the loss
 
 
 
