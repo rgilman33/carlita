@@ -9,7 +9,7 @@ aux_properties = ['angle_to_wp', 'last_applied_steer', 'last_applied_throttle', 
 control_properties = ['steer', 'throttle']
 aux_pred = ['front_angle']
 
-#control_properties = control_properties + aux_pred
+targets = control_properties + aux_pred
 
 from procgen import ProcgenGym3Env
 import time
@@ -60,7 +60,7 @@ class DataLoader:
         # Empty np containers
         front_container = np.empty((seq_len, bs, IMG_SZ, IMG_SZ, 3), dtype=np.uint8)
         aux_container = np.empty((seq_len, bs, len(aux_properties)), dtype=np.float)
-        control_container = np.empty((seq_len, bs, len(control_properties)), dtype=np.float)
+        targets_container = np.empty((seq_len, bs, len(targets)), dtype=np.float)
         
         # Env interaction. Fill out np containers
         for i in range(seq_len):
@@ -92,9 +92,9 @@ class DataLoader:
             
 
             front_container[i,:,:,:,:] = img
-            control_container[i,:,0] = np.array([e['autopilot_steer'] for e in info])
-            control_container[i,:,1] = np.array([e['autopilot_throttle'] for e in info])
-            #control_container[i,:,2] = np.array([e['front_angle'] for e in info])
+            targets_container[i,:,0] = np.array([e['autopilot_steer'] for e in info])
+            targets_container[i,:,1] = np.array([e['autopilot_throttle'] for e in info])
+            targets_container[i,:,2] = np.array([e['front_angle'] for e in info])
 
             for aux_i, aux_col in enumerate(aux_properties):
                 aux_container[i,:,aux_i] = np.array([e[aux_col] for e in info])
@@ -103,13 +103,13 @@ class DataLoader:
         # np containers to pytorch containers
         front_container = torch.from_numpy(front_container.astype(np.float32)/255.).permute(0,1,4,2,3)
         aux_container = torch.from_numpy(aux_container.astype(np.float32))
-        control_container = torch.from_numpy(control_container.astype(np.float32))
+        targets_container = torch.from_numpy(targets_container.astype(np.float32))
         
         # add to queued chunks
             
         self.queued_chunks.append((front_container,
                                     aux_container, 
-                                    control_container))
+                                    targets_container))
         
         print(f"Queueing chunk of size {front_container.shape} took {np.round(time.time() - t1, 2)} seconds")  
 
@@ -117,7 +117,7 @@ class DataLoader:
 
 
 n_aux = len(aux_properties)
-n_actions = len(control_properties)
+n_targets = len(targets)
 DROP = .20
 N_LSTM_LAYERS = 1
 N_LSTM_HIDDEN = 512
@@ -152,7 +152,7 @@ class VizCNN(nn.Module):
         self.use_rnn = use_rnn
 
         self.fc1 = nn.Linear(N_LSTM_HIDDEN, 512) 
-        self.fc2 = nn.Linear(512, n_actions)
+        self.fc2 = nn.Linear(512, n_targets)
 
         # placeholder for the gradients
         self.gradients = None
@@ -319,7 +319,7 @@ class ImpalaCNN(nn.Module):
             self.lstm = nn.LSTM(N_LSTM_HIDDEN, N_LSTM_HIDDEN, N_LSTM_LAYERS)
 
         self.fc1 = nn.Linear(N_LSTM_HIDDEN, 512) 
-        self.fc2 = nn.Linear(512, n_actions)
+        self.fc2 = nn.Linear(512, n_targets)
 
                 # placeholder for the gradients
         self.gradients = None
