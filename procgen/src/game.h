@@ -23,7 +23,7 @@ Base class used for all games, all games must inherit from this
 const int RES_W = 64;
 const int RES_H = 64;
 
-const int RENDER_RES = 512;
+const int RENDER_RES = 64;
 
 void bgr32_to_rgb888(void *dst_rgb888, void *src_bgr32, int w, int h);
 
@@ -79,6 +79,7 @@ class Game {
     StepData step_data;
     //int action = 0; RG
     float action = .0;
+    float action_throttle = .0;
 
     int timeout = 0;
 
@@ -103,6 +104,8 @@ class Game {
     // pointers to buffers
     //int32_t *action_ptr; RG
     float_t *action_ptr;
+    float_t *action_ptr_throttle;
+
     std::vector<void *> obs_bufs;
     std::vector<void *> info_bufs;
     float *reward_ptr = nullptr;

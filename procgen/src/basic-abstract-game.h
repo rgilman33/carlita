@@ -50,7 +50,7 @@ class BasicAbstractGame : public Game {
     virtual void choose_world_dim();
     virtual bool should_draw_entity(const std::shared_ptr<Entity> &entity);
     //virtual void set_action_xy(int move_action); //RG added below but keeping this in so code doesn't break
-    virtual void set_action_xy(float move_action);
+    virtual void set_action_xy(float move_action, float move_action_2);
     virtual void choose_center(float &cx, float &cy);
     virtual void update_agent_velocity();
     virtual QRectF get_adjusted_image_rect(int type, const QRectF &rect);

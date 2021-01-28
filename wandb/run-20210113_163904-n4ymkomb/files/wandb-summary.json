@@ -1,0 +1,1 @@
+{"val score indist": 0.4116961736150771, "val score outdist": 0.3822235393348075, "collisions indist": 4.497529644268774, "collisions outdist": 4.097514340344168, "_step": 14, "_runtime": 818, "_timestamp": 1610581963, "Chunk Loss": 0.0502, "Seconds per iter": 27, "LR": 0.0003, "Total time (min)": 13}

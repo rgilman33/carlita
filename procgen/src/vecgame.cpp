@@ -56,7 +56,7 @@ int libenv_get_tensortypes(libenv_env *handle, enum libenv_space_name name, stru
         types = venv->observation_types;
     } else if (name == LIBENV_SPACE_ACTION) {
         types = venv->action_types;
-        fassert(types.size() == 1);
+        //fassert(types.size() == 1);
         //fassert(types[0].dtype == LIBENV_DTYPE_INT32); RG
         fassert(types[0].dtype == LIBENV_DTYPE_FLOAT32);
     } else if (name == LIBENV_SPACE_INFO) {
@@ -175,7 +175,7 @@ VecGame::VecGame(int _nenvs, VecOptions opts) {
 
     int num_levels = 0;
     int start_level = -1;
-    num_actions = -1;
+    num_actions = 2;// -1;
 
     int rand_seed = 0;
     int num_threads = 4;
@@ -237,7 +237,7 @@ VecGame::VecGame(int _nenvs, VecOptions opts) {
 
     {
         struct libenv_tensortype s;
-        strcpy(s.name, "action");
+        strcpy(s.name, "action_steer");
         s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
         s.dtype = LIBENV_DTYPE_FLOAT32;
         s.ndim = 0;
@@ -245,6 +245,26 @@ VecGame::VecGame(int _nenvs, VecOptions opts) {
         s.high.float32 = 100.f;
         action_types.push_back(s);
     }
+    {
+        struct libenv_tensortype s;
+        strcpy(s.name, "action_throttle");
+        s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
+        s.ndim = 0;
+        s.low.float32 = 0.f;
+        s.high.float32 = 100.f;
+        action_types.push_back(s);
+    }
+    // {
+    //     struct libenv_tensortype s;
+    //     strcpy(s.name, "action_throttle");
+    //     s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
+    //     s.dtype = LIBENV_DTYPE_FLOAT32;
+    //     s.ndim = 0;
+    //     s.low.float32 = 0.f;
+    //     s.high.float32 = 100.f;
+    //     action_types.push_back(s);
+    // }
 
     {
         struct libenv_tensortype s;
@@ -281,6 +301,68 @@ VecGame::VecGame(int _nenvs, VecOptions opts) {
 
     {
         struct libenv_tensortype s;
+        strcpy(s.name, "collision");
+        s.scalar_type = LIBENV_SCALAR_TYPE_DISCRETE;
+        s.dtype = LIBENV_DTYPE_INT32;
+        s.ndim = 0,
+        s.low.int32 = 0;
+        s.high.int32 = INT32_MAX;
+        info_types.push_back(s);
+    }
+    {
+        struct libenv_tensortype s;
+        strcpy(s.name, "waypoint_infraction");
+        s.scalar_type = LIBENV_SCALAR_TYPE_DISCRETE;
+        s.dtype = LIBENV_DTYPE_INT32;
+        s.ndim = 0,
+        s.low.int32 = 0;
+        s.high.int32 = INT32_MAX;
+        info_types.push_back(s);
+    }
+
+    {
+        struct libenv_tensortype s;
+        strcpy(s.name, "successful_stop");
+        s.scalar_type = LIBENV_SCALAR_TYPE_DISCRETE;
+        s.dtype = LIBENV_DTYPE_INT32;
+        s.ndim = 0,
+        s.low.int32 = 0;
+        s.high.int32 = INT32_MAX;
+        info_types.push_back(s);
+    }
+        {
+        struct libenv_tensortype s;
+        strcpy(s.name, "current_speed");
+        s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
+        s.ndim = 0,
+        s.low.float32 = 0.f;
+        s.high.float32 = 100.f;
+        info_types.push_back(s);
+    }
+    {
+        struct libenv_tensortype s;
+        strcpy(s.name, "front_angle");
+        s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
+        s.ndim = 0,
+        s.low.float32 = 0.f;
+        s.high.float32 = 100.f;
+        info_types.push_back(s);
+    }
+        {
+        struct libenv_tensortype s;
+        strcpy(s.name, "dv");
+        s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
+        s.ndim = 0,
+        s.low.float32 = 0.f;
+        s.high.float32 = 100.f;
+        info_types.push_back(s);
+    }
+
+    {
+        struct libenv_tensortype s;
         strcpy(s.name, "autopilot_steer");
         s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
         s.dtype = LIBENV_DTYPE_FLOAT32;
@@ -289,7 +371,47 @@ VecGame::VecGame(int _nenvs, VecOptions opts) {
         s.high.float32 = 100.f;
         info_types.push_back(s);
     }
-    
+    {
+        struct libenv_tensortype s;
+        strcpy(s.name, "autopilot_throttle");
+        s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
+        s.ndim = 0,
+        s.low.float32 = 0.f;
+        s.high.float32 = 100.f;
+        info_types.push_back(s);
+    }
+    {
+        struct libenv_tensortype s;
+        strcpy(s.name, "last_applied_throttle");
+        s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
+        s.ndim = 0,
+        s.low.float32 = 0.f;
+        s.high.float32 = 100.f;
+        info_types.push_back(s);
+    }
+    {
+        struct libenv_tensortype s;
+        strcpy(s.name, "last_applied_steer");
+        s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
+        s.ndim = 0,
+        s.low.float32 = 0.f;
+        s.high.float32 = 100.f;
+        info_types.push_back(s);
+    }
+    {
+        struct libenv_tensortype s;
+        strcpy(s.name, "angle_to_wp");
+        s.scalar_type = LIBENV_SCALAR_TYPE_REAL;
+        s.dtype = LIBENV_DTYPE_FLOAT32;
+        s.ndim = 0,
+        s.low.float32 = 0.f;
+        s.high.float32 = 360.f;
+        info_types.push_back(s);
+    }
+
     if (render_human) {
         struct libenv_tensortype s;
         strcpy(s.name, "rgb");
@@ -361,7 +483,9 @@ void VecGame::set_buffers(const std::vector<std::vector<void *>> &ac, const std:
             const auto &game = games[e];
             // we only ever have one action
             //game->action_ptr = (int32_t *)(ac[e][0]); RG
-            game->action_ptr = (float_t *)(ac[e][0]);
+            game->action_ptr = (float_t *)(ac[e][0]); // Action IS coming through here. Both of them. This is the procgen game.cpp
+            game->action_ptr_throttle = (float_t *)(ac[e][1]); 
+
             game->obs_bufs = ob[e];
             game->info_bufs = info[e];
             game->reward_ptr = &rew[e];
@@ -409,7 +533,8 @@ void VecGame::act() {
             const auto &game = games[e];
             fassert(!game->is_waiting_for_step);
             // save the action since it's only valid for the duration of this call
-            game->action = *game->action_ptr;
+            game->action = *game->action_ptr; // This is where setting action?
+            game->action_throttle = *game->action_ptr_throttle;
             if (threads.size() == 0) {
                 // special case for no threads
                 game->step();

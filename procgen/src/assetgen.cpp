@@ -150,6 +150,7 @@ QRectF AssetGen::create_bar(QRectF rect, bool is_horizontal) {
 
 void AssetGen::paint_shape_resource(QPainter &p, QRectF rect) {
     ColorGen cgen;
+    
     cgen.rand_gen = rand_gen;
     cgen.roll();
 
@@ -160,6 +161,9 @@ void AssetGen::paint_shape_resource(QPainter &p, QRectF rect) {
     p.save();
 
     p.setCompositionMode(QPainter::CompositionMode_Source);
+
+    //p.rotate(rand_gen->randrange(0, 6.28));
+
     p.fillRect(rect, QColor(0, 0, 0, 0));
 
     for (int i = 0; i < nbar1; i++) {
@@ -183,6 +187,8 @@ void AssetGen::paint_shape_resource(QPainter &p, QRectF rect) {
     p.restore();
 }
 
+
+
 void AssetGen::generate_resource(std::shared_ptr<QImage> img, int num_recurse, int blotch_scale, bool is_rect) {
     QPainter p(img.get());
     QRectF rect = QRectF(0, 0, img->width(), img->height());
@@ -192,4 +198,15 @@ void AssetGen::generate_resource(std::shared_ptr<QImage> img, int num_recurse, i
     } else {
         paint_shape_resource(p, rect);
     }
+}
+
+void AssetGen::make_circle(std::shared_ptr<QImage> img, int num_recurse, int blotch_scale, bool is_rect) {
+    QPainter p(img.get());
+    QRectF rect = QRectF(0, 0, img->width(), img->height());
+
+    p.save();
+    QColor color = QColor(30, 10, 100); 
+	p.setBrush(color);
+    p.drawEllipse(rect);
+    p.restore();
 }

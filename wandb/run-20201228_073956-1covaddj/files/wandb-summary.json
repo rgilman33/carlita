@@ -1,0 +1,1 @@
+{"graph_0": {"_type": "graph-file", "path": "media/graph/graph_0_summary_d13308a1.graph.json", "sha256": "d13308a19fad76b8695e01e1129d7b0d387dde1c2247c98c93e9fed38a96bc7f", "size": 5655}, "Chunk Loss": 0.0133, "Total Seconds": 23, "LR": 0.0003, "_step": 13, "_runtime": 536, "_timestamp": 1609166932, "val score indist": 0.34437, "val score outdist": 0.3637}

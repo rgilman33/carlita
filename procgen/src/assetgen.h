@@ -20,6 +20,7 @@ class AssetGen {
   public:
     AssetGen(RandGen *rg);
     void generate_resource(std::shared_ptr<QImage> img, int num_recurse = 1, int blotch_scale = 50, bool is_rect = true);
+    void make_circle(std::shared_ptr<QImage> img, int num_recurse = 1, int blotch_scale = 50, bool is_rect = true);
 
   private:
     RandGen *rand_gen;

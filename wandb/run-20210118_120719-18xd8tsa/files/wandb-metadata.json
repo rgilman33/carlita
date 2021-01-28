@@ -1,0 +1,26 @@
+{
+    "os": "Linux-5.8.0-7630-generic-x86_64-with-debian-bullseye-sid",
+    "python": "3.7.3",
+    "heartbeatAt": "2021-01-18T19:07:20.433310",
+    "startedAt": "2021-01-18T19:07:19.277351",
+    "docker": null,
+    "gpu": "GeForce RTX 2070 with Max-Q Design",
+    "gpu_count": 1,
+    "cpu_count": 12,
+    "cuda": null,
+    "args": [
+        "-f",
+        "/home/beans/.local/share/jupyter/runtime/kernel-1d5b5f34-6318-46b7-9431-5f07d4719e94.json"
+    ],
+    "state": "running",
+    "program": "<python with no main file>",
+    "git": {
+        "remote": "https://github.com/rgilman33/carlita.git",
+        "commit": "4eaef1a63314dee924ae7115d6316b265863cc1c"
+    },
+    "email": null,
+    "root": "/home/beans/carlita",
+    "host": "pop-os",
+    "username": "beans",
+    "executable": "/home/beans/anaconda3/envs/procgen/bin/python3.7"
+}

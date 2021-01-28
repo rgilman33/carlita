@@ -1,0 +1,56 @@
+
+Struggling to get lstm to learn. Want to get lstm to learn our task of front angle rotation. It's taking wayyyy longer than the other challenges. We learned to lane follow in ten min. Learned NPC negotiation in an hour. Learned NPCs + road obstacles in less than a couple hours. Rotating front angle, however, has already been 5+ hours and counting and still not very good. This is the first 'metalearning' task we've asked the model to perform. Is metalearning w an rnn just very hard?
+
+Is metalearning fundamentally different than normal memory? In normal memory we're saying "hey, you saw this thing, remember it for a bit". In metalearning we're saying "given these states and these actions, work out how your actions affected the states, ie learn the dynamics of this env". I guess that could indeed be more difficult. Like in the papers by Duan and the one by Wang, it is performing an RL or IL task within the task itself. If we try other metalearning objectives, ie ones that require learning the dynamics of the env, are those also difficult? Steer and throttle sensitivity, for starters, feel like they should be straightforward to learn. 
+
+What is the difference conceptually between learning a metalearning task and a simple lstm task? Are they fundamentally different? Can we see difference in the hidden states? Would auxiliary prediction of the config help by focusing attention on the dimensions of variability? 
+
+In the metalearning task of front angle rotation, the model will have to fundamentally alter what it does with the spatial activations coming in off of the CNN layers. In all other tasks, model can use each CNN activation in the exact same way, bc they represent the exact same location. We're es
+sentially doing random rotations of the camera and making the model work it out. That does strike me as a difficult operation to learn. 
+
+We are relying fundamentally on the system identification task of the LSTM. We need better understanding of those dynamics. 
+
+Are we forgetting the dynamics of the system? 
+"We also observe that the policy appears more likely to drop the cube after being stuck on a challenging face rotation for
+a while. We do not quantify this but hypothesize that it might have “forgotten” about flips by then since the recurrent
+state of the policy has only observed a mostly stationary cube for several seconds"
+OpenAi rubiks cube
+
+Ah the term is "on line system identification". Openai notes that their version, however, is emergent. 
+
+Very relevent for us:
+"The second experiment perturbs the environment by resetting its environment dynamics but keeping the simulation
+state itself intact (see Figure 18b). We see a similar effect as before: after the perturbation is applied, the time to
+completion spikes up and then decreases again as the policy adjusts. Interestingly this time the policy is more likely
+to fail compared to resetting the hidden state. This is likely the case because the policy is “surprised” by the sudden
+change and performed actions that would have been appropriate for the old environment dynamics but led to failure in
+the new ones."
+
+Rubiks cube team did the same thing we were thinking: Predict env params using lstm hidden state to verify what it's storing. They found all the info they were looking for. 
+
+They also predict bins of discretized values using the above model and found that certainty increased over time. Using the same technique we're planning. 
+
+
+###########
+Our goal is to create a self driving car in a way that is generally helpful for all of ML-robotics. I think the way forward is sim2real transfer bc it unlocks the ability of unlimited interesting data. Moves the problem to a space where we know it to be solvable (though still difficult). I think the way to enable sim2real transfer is metalearning and DR. The answers to this also further the broader goals of generalization in ML.
+
+There exists a simulator, built using today's tools, that if mastered will enable transfer to a real car with only a few trajectories for fine-tuning (at most). Rubik's cube work showed this to be the case.  
+
+We started working w the CARLA simulator but found we weren't able to iterate quickly enough. Each experiment took a day to complete, at the very least. We need an mnist of av, a fruit fly. Also note that CARLA was doing what we don't need: high fidelity sim, but didn't do the things we do need: DR and metaL, negotiation, broad road logic scenarios, so we created a sim w everything we need, nothing we don't. Specializes in the hard parts of av: negotiation, road logic, generalization. 
+
+We are currently in the process of better understanding the metaL and DR space. We think these are key to unlocking sim2real, yet we don't have an intuition for how they work. This was the point of carlita. Working purely in carla, we could not gain this intuition fast enough. The point of the carlita series is to personally gain a thorough intuition of what's possible w metaL and DR. 
+
+Connected to this is the existing literature on metaL and DR. There's not a lot of it, but what exists we should fully ingest so as to not have to repeat it ourselves. 
+
+
+############
+A working log as we pursue the above goal. Written in the casual style of Kevin's newsletters. Written for our own learning and organization of thought. Up close view of how technical challenge is undertaken, nitty gritty on the bugs, the ideas, the blind alleys, false starts, occasional successes. The sort of thing I myself would love to read about someone elses technical work.
+
+
+
+
+
+
+
+
+

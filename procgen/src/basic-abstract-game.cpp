@@ -104,11 +104,14 @@ void BasicAbstractGame::initialize_asset_if_necessary(int img_idx) {
 
     if (names.size() == 0) {
         AssetGen pgen(&asset_rand_gen);
+
         asset_rand_gen.seed(fixed_asset_seed + type);
+        //asset_rand_gen.seed(rand_gen.randint(0,100));
 
         std::shared_ptr<QImage> small_image(new QImage(64, 64, QImage::Format_ARGB32));
         asset_ptr = small_image;
-        pgen.generate_resource(asset_ptr, 0, 5, use_block_asset(type));
+        //pgen.generate_resource(asset_ptr, 0, 5, use_block_asset(type));
+        pgen.make_circle(asset_ptr, 0, 5, use_block_asset(type));
 
         num_themes = 1;
         aspect_ratio = 1.0;
@@ -665,7 +668,7 @@ void BasicAbstractGame::basic_step_object(const std::shared_ptr<Entity> &obj) {
 //     action_vy = move_act % 3 - 1;
 //     action_vrot = 0;
 // }
-void BasicAbstractGame::set_action_xy(float move_act) {
+void BasicAbstractGame::set_action_xy(float move_act, float move_act_2) {
     action_vx = move_act;
     action_vy = move_act;
     action_vrot = move_act;
@@ -714,18 +717,17 @@ void BasicAbstractGame::game_step() {
     action_vx = 0;
     action_vy = 0;
 
-    // set_action_xy(move_action); rg
-    set_action_xy(.0f);
+    set_action_xy(move_action, move_action);
 
-    if (grid_step) {
-        agent->vx = action_vx;
-        agent->vy = action_vy;
-    } else {
-        update_agent_velocity();
+    // if (grid_step) {
+    //     agent->vx = action_vx;
+    //     agent->vy = action_vy;
+    // } else {
+        //update_agent_velocity(); RG doing this within game
 
         agent->vrot = MIXRATEROT * agent->vrot;
         agent->vrot += MIXRATEROT * MAXVTHETA * action_vrot;
-    }
+    //}
 
     step_entities(entities);
 

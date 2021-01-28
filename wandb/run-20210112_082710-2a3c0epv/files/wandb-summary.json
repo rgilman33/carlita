@@ -1,0 +1,1 @@
+{"val score indist": 0.8547113163972286, "val score outdist": 0.8612514484356895, "collisions indist": 2.5961152042866713, "collisions outdist": 2.2848751835535976, "wp infractions indist": 0.00358, "wp infractions outdist": 0.00372, "_step": 24, "_runtime": 1261, "_timestamp": 1610466491, "Chunk Loss": 0.0355, "Total Seconds": 27, "LR": 0.0003}

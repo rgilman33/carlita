@@ -202,6 +202,9 @@ void Game::serialize(WriteBuffer *b) {
 
     //b->write_int(action); rg
     b->write_float(action);
+    b->write_float(action_throttle);
+
+
     b->write_int(timeout);
 
     b->write_int(current_level_seed);
@@ -264,6 +267,9 @@ void Game::deserialize(ReadBuffer *b) {
 
     //action = b->read_int(); RG
     action = b->read_float();
+    action_throttle = b->read_float();
+
+
     timeout = b->read_int();
 
     current_level_seed = b->read_int();

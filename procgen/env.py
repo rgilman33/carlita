@@ -136,7 +136,8 @@ class BaseProcgenEnv(CEnv):
             ],
         )
         # don't use the dict space for actions
-        self.ac_space = self.ac_space["action"]
+        # self.ac_space = self.ac_space["action_steer"] RG commenting out, didn't do anything
+        # print('AC SPACE', self.ac_space)
 
     def get_state(self):
         length = MAX_STATE_SIZE
@@ -196,11 +197,15 @@ class BaseProcgenEnv(CEnv):
         return result
 
     def act(self, ac):
+        #print(ac); # These are the actions we're getting FROM the user on python end.
+        
         # tensorflow may return int64 actions (https://github.com/openai/gym/blob/master/gym/spaces/discrete.py#L13)
         # so always cast actions to int32
         #return super().act({"action": ac.astype(np.int32)})
-        return super().act({"action": ac.astype(np.float32)})
-
+        try:
+            return super().act({"action_steer": ac[:,0].astype(np.float32), "action_throttle": ac[:,1].astype(np.float32)})
+        except: # Sloppy fix: Interactive version was only piping in one dimension, we expect more now that altering action space
+            return super().act({"action_steer": ac.astype(np.float32), "action_throttle": ac.astype(np.float32)})
 
 class ProcgenGym3Env(BaseProcgenEnv):
     """
