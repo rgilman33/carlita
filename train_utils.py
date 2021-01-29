@@ -120,7 +120,7 @@ n_aux = len(aux_properties)
 n_targets = len(targets)
 DROP = .20
 N_LSTM_LAYERS = 1
-N_LSTM_HIDDEN = 256
+N_LSTM_HIDDEN = 512
 
 IMG_SZ = 64
 
