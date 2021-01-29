@@ -674,7 +674,7 @@ class TestGame : public BasicAbstractGame {
         actually_randgen.seed(ss);
 
         // This is the line that makes it not learn.
-        RAND_ROTATE = 0.f;//actually_randgen.randrange(0, 2*PI);
+        RAND_ROTATE = actually_randgen.randrange(0, 2*PI);
 
         front_angle = RAND_ROTATE;
 
@@ -821,7 +821,7 @@ class TestGame : public BasicAbstractGame {
         *(float_t *)(info_bufs[info_name_to_offset.at("current_speed")]) = (float) std::clamp(current_speed, -5.f, 5.f);
         *(float_t *)(info_bufs[info_name_to_offset.at("dv")]) = (float) dv;
 
-        *(float_t *)(info_bufs[info_name_to_offset.at("front_angle")]) = (float) (front_angle / 10.f); // making it less important in the loss
+        *(float_t *)(info_bufs[info_name_to_offset.at("front_angle")]) = (float) (front_angle); // making it less important in the loss
 
 
 
