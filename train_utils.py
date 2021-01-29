@@ -7,7 +7,7 @@ import random
 
 aux_properties = ['angle_to_wp', 'last_applied_steer', 'last_applied_throttle', 'current_speed', 'dv']
 control_properties = ['steer', 'throttle']
-aux_pred = ['front_angle']
+aux_pred = [] #['front_angle']
 
 targets = control_properties + aux_pred
 
@@ -73,15 +73,15 @@ class DataLoader:
 
             # DAGGER
 
-            # # Create dagger controls, toggle it on and off
-            # if i % self.DAGGER_CADENCE == 0:
-            #     self.dagger_counter = 0
-            #     steer_aug = random.uniform(-.3, .3)
-            #     #throttle_aug = random.uniform(.5, 1.5)
-            #     daggerized_controls = np.array([[c[0]+steer_aug, c[1]] for c in autopilot_controls])
-            #     self.do_dagger = True
-            # elif self.dagger_counter == self.DAGGER_DURATION:
-            #     self.do_dagger = False
+            # Create dagger controls, toggle it on and off
+            if i % self.DAGGER_CADENCE == 0:
+                self.dagger_counter = 0
+                steer_aug = random.uniform(-.3, .3)
+                #throttle_aug = random.uniform(.5, 1.5)
+                daggerized_controls = np.array([[c[0]+steer_aug, c[1]] for c in autopilot_controls])
+                self.do_dagger = True
+            elif self.dagger_counter == self.DAGGER_DURATION:
+                self.do_dagger = False
 
             # Implement control
             if self.do_dagger:
@@ -94,7 +94,7 @@ class DataLoader:
             front_container[i,:,:,:,:] = img
             targets_container[i,:,0] = np.array([e['autopilot_steer'] for e in info])
             targets_container[i,:,1] = np.array([e['autopilot_throttle'] for e in info])
-            targets_container[i,:,2] = np.array([e['front_angle'] for e in info])
+            #targets_container[i,:,2] = np.array([e['front_angle'] for e in info])
 
             for aux_i, aux_col in enumerate(aux_properties):
                 aux_container[i,:,aux_i] = np.array([e[aux_col] for e in info])
@@ -120,7 +120,7 @@ n_aux = len(aux_properties)
 n_targets = len(targets)
 DROP = .20
 N_LSTM_LAYERS = 1
-N_LSTM_HIDDEN = 512
+N_LSTM_HIDDEN = 256
 
 IMG_SZ = 64
 

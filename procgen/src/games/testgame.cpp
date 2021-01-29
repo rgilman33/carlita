@@ -46,7 +46,6 @@ class TestGame : public BasicAbstractGame {
     bool USE_AUTOPILOT = false;
 
     float front_angle = 0;
-
     
     float autopilot_steer;
     float autopilot_throttle;
@@ -675,7 +674,7 @@ class TestGame : public BasicAbstractGame {
         actually_randgen.seed(ss);
 
         // This is the line that makes it not learn.
-        RAND_ROTATE = actually_randgen.randrange(0, 2*PI);
+        RAND_ROTATE = 0.f;//actually_randgen.randrange(0, 2*PI);
 
         front_angle = RAND_ROTATE;
 
