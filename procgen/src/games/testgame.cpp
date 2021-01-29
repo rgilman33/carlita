@@ -674,7 +674,8 @@ class TestGame : public BasicAbstractGame {
         actually_randgen.seed(ss);
 
         // This is the line that makes it not learn.
-        RAND_ROTATE = actually_randgen.randrange(0, 2*PI);
+        //RAND_ROTATE = actually_randgen.randrange(0, 2*PI);
+        RAND_ROTATE = rand_gen.randrange(0, 2*PI);
 
         front_angle = RAND_ROTATE;
 

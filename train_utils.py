@@ -5,7 +5,7 @@ import numpy as np
 import random
 
 
-aux_properties = ['angle_to_wp', 'last_applied_steer', 'last_applied_throttle', 'current_speed', 'dv', "front_angle"]
+aux_properties = ['angle_to_wp', 'last_applied_steer', 'last_applied_throttle', 'current_speed', 'dv']
 control_properties = ['steer', 'throttle']
 aux_pred = [] #['front_angle']
 
