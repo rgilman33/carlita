@@ -204,6 +204,7 @@ class VizCNN(nn.Module):
 
 
         x = self.conv_2a(x)
+        # TODO NOTE WHY ARE WE MISSING ACTIVATIONS HERE??
         x = self.conv_2b(x)
         #x = self.pooler(x)
         x = self.act(x)

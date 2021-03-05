@@ -102,11 +102,12 @@ void AssetGen::paint_shape(QPainter &p, QRectF main_rect, ColorGen *cgen) {
 }
 
 void AssetGen::paint_rect_resource(QPainter &p, QRectF rect, int num_recurse, int blotch_scale) {
+    // Paints background
     ColorGen cgen;
     cgen.rand_gen = rand_gen;
     cgen.roll();
 
-    QColor bgcolor = cgen.rand_color();
+    QColor bgcolor = QColor("Red"); //cgen.rand_color();
 
     p.fillRect(rect, bgcolor);
 
@@ -114,7 +115,7 @@ void AssetGen::paint_rect_resource(QPainter &p, QRectF rect, int num_recurse, in
 
     float max_rand_dim = .5 * scale;
     float min_rand_dim = .05 * scale;
-    int num_blotches = rand_gen->randint(blotch_scale, 2 * blotch_scale);
+    int num_blotches = 100; //rand_gen->randint(blotch_scale, 2 * blotch_scale); // 1000 is alot
     float p_recurse = rand_gen->rand01() * .75;
 
     for (int j = 0; j < num_blotches; j++) {
@@ -127,7 +128,7 @@ void AssetGen::paint_rect_resource(QPainter &p, QRectF rect, int num_recurse, in
         }
     }
 
-    bgcolor.setAlpha(200);
+    bgcolor.setAlpha(100); // transparency, less allows more shapes coming through
     p.fillRect(rect, bgcolor);
 }
 

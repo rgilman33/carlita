@@ -478,13 +478,15 @@ public:
 	void draw (QPainter &painter) 
 	{
 		//QColor color = QColor(rand_gen.randn(255), rand_gen.randn(255), rand_gen.randn(255)); 
-
+		painter.save();
+		painter.setOpacity(.5f);
 		for (Edge &e : edges) {
-			QColor color = QColor(30, 130, 50); 
-
-			painter.setPen(QPen(color, LANE_WIDTH*2, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
+			QColor color = QColor("DarkCyan"); 
+			
+			painter.setPen(QPen(color, LANE_WIDTH*2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 			painter.drawPath(e.m_q_path);
 		}
+		painter.restore();
 
 		painter.save();
 		for (Edge &e : edges) {

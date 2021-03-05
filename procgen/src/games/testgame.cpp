@@ -43,7 +43,7 @@ class TestGame : public BasicAbstractGame {
 
     float RAND_ROTATE;
 
-    bool USE_AUTOPILOT = false;
+    bool USE_AUTOPILOT = true;
 
     float front_angle = 0;
     
