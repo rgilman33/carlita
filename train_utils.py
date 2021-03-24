@@ -128,19 +128,16 @@ class Flatten(nn.Module):
     def forward(self, x):
         return x.contiguous().view(x.size(0), -1) #contiguous is bc of how the tensors are stored on disk. Can also do reshape instead of view
 
-class VizCNN(nn.Module):
-    def __init__(self):
-        super(VizCNN, self).__init__()
-        scale = 4
 
-        emb_sz = 24
-        self.emb = nn.Embedding(2, emb_sz)
+class VizCNN(nn.Module):
+    def __init__(self, use_rnn=False):
+        super(VizCNN, self).__init__()
 
         self.pooler = nn.MaxPool2d(kernel_size=2)
         self.act = nn.ReLU()
-        self.drop = nn.Dropout(DROP)
+        scale = 2
 
-        self.conv_1a = nn.Conv2d(in_channels=channels, out_channels=16, kernel_size=7)
+        self.conv_1a = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=7)
         self.bn1 = nn.BatchNorm2d(16)
         self.conv_2a = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=5)
         self.bn2a = nn.BatchNorm2d(32)
@@ -151,131 +148,7 @@ class VizCNN(nn.Module):
         self.conv_4a = nn.Conv2d(in_channels=32*scale, out_channels=32*scale, kernel_size=5)
         self.bn4 = nn.BatchNorm2d(32*scale)
 
-        n = 1056*scale + emb_sz #2112 # flattened CNN activations + aux
-        n_lstm_in = 512
-
-        self.fc0 = nn.Linear(n, n_lstm_in)
-
-        #self.lstm = nn.LSTM(n_lstm_in, N_LSTM_HIDDEN, N_LSTM_LAYERS)
-        self.fc1 = nn.Linear(N_LSTM_HIDDEN, 512) 
-        self.fc2 = nn.Linear(512, n_targets)
-
-        self.gradients = None
-        
-
-    def activations_hook(self, grad):
-        self.gradients = grad
-    
-    def get_activations_gradient(self):
-        return self.gradients
-
-        
-    def forward(self, x, aux, register_activations=False, return_salmap=False, return_uncertainty_est=False):
-
-        # 7x7 convolutional layer with 16 channels (layer 1a)
-        # 2x2 L2 pooling layer
-
-        # 5x5 convolutional layer with 32 channels (layer 2a)
-        # 5x5 convolutional layer with 32 channels (layer 2b)
-        # 2x2 L2 pooling layer
-
-        # 5x5 convolutional layer with 32 channels (layer 3a)
-        # 2x2 L2 pooling layer
-
-        # 5x5 convolutional layer with 32 channels (layer 4a)
-        # 2x2 L2 pooling layer
-
-        # 256-unit dense layer
-        # 512-unit dense layer
-        # 10-unit dense layer (1 unit for the value function, 9 units for the policy logits)
-
-        # Reshape for cnn
-        #seq_len, bs, C, H, W = x.shape
-
-        #x = x.view(seq_len*bs, C, H, W)
-
-        x = self.conv_1a(x)
-        x = self.bn1(x)
-        x = self.act(x)
-        x = self.pooler(x)
-
-        x = self.conv_2a(x)
-        x = self.bn2a(x)
-        x = self.act(x) # Why was this activation missing?
-
-        x = self.conv_2b(x)
-        x = self.bn2b(x)
-        x = self.pooler(x)
-        x = self.act(x)
-
-        ################
-        # Grabbing gradients and activations for viz
-        activations = x
-        if register_activations:
-            activations.register_hook(self.activations_hook)
-        salmap = activations.detach().cpu().numpy()
-        x = activations
-        ################
-
-        x = self.conv_3a(x)
-        x = self.bn3(x)
-        x = self.pooler(x)
-        x = self.act(x)
-
-        x = self.conv_4a(x)
-        x = self.bn4(x)
-        x = self.pooler(x)
-        x = self.act(x)
-
-        features = Flatten()(x); #print(features.shape)
-
-        emb = self.emb(aux[:,0])
-        features = torch.cat([features, emb], dim=-1)
-
-
-        # Back to shape for RNN
-        #features = features.view(seq_len, bs, -1)
-
-        features = self.fc0(features)
-        features = self.act(features)
-        features = self.drop(features)
-
-        #features, hidden = self.lstm(features, hidden)
-
-        features = self.fc1(features)
-        uncertainty_input = features
-        features = self.act(features)
-        features = self.drop(features)
-
-        features = self.fc2(features)
-
-        if return_salmap:
-            return features, salmap
-        elif return_uncertainty_est:
-            return features, uncertainty_input
-        else:
-            return features
-
-
-class VizCNN(nn.Module):
-    def __init__(self, use_rnn=False):
-        super(VizCNN, self).__init__()
-
-        self.pooler = nn.MaxPool2d(kernel_size=2)
-        self.act = nn.ReLU()
-
-        self.conv_1a = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=7)
-        self.bn1 = nn.BatchNorm2d(16)
-        self.conv_2a = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=5)
-        self.bn2a = nn.BatchNorm2d(32)
-        self.conv_2b = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=5)
-        self.bn2b = nn.BatchNorm2d(32)
-        self.conv_3a = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=5)
-        self.bn3 = nn.BatchNorm2d(32)
-        self.conv_4a = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=5)
-        self.bn4 = nn.BatchNorm2d(32)
-
-        n = 5408 + n_aux # flattened CNN activations + aux
+        n = 5184 + n_aux # flattened CNN activations + aux
 
         self.fc0 = nn.Linear(n, N_LSTM_HIDDEN)
 
@@ -324,7 +197,7 @@ class VizCNN(nn.Module):
         x = self.conv_1a(x)
         x = self.bn1(x)
         x = self.act(x)
-        x = self.pooler(x)
+        #x = self.pooler(x)
 
         x = self.conv_2a(x)
         x = self.bn2a(x)
@@ -332,7 +205,7 @@ class VizCNN(nn.Module):
 
         x = self.conv_2b(x)
         x = self.bn2b(x)
-        x = self.pooler(x)
+        #x = self.pooler(x)
         x = self.act(x)
 
         ################
