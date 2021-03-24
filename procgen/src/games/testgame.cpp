@@ -43,7 +43,7 @@ class TestGame : public BasicAbstractGame {
 
     float RAND_ROTATE;
 
-    bool USE_AUTOPILOT = true;
+    bool USE_AUTOPILOT = false;
 
     float front_angle = 0;
     
@@ -675,7 +675,7 @@ class TestGame : public BasicAbstractGame {
 
         // This is the line that makes it not learn.
         //RAND_ROTATE = actually_randgen.randrange(0, 2*PI);
-        RAND_ROTATE = rand_gen.randrange(0, 2*PI);
+        RAND_ROTATE = 0; //rand_gen.randrange(0, 2*PI);
 
         front_angle = RAND_ROTATE;
 
