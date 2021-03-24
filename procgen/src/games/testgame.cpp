@@ -611,25 +611,26 @@ class TestGame : public BasicAbstractGame {
         // we rotate and translate the painter
 
 
-        // Compass line
-        float compass_line_width = 1.5; // not being drawn bc of translation errors in the smaller obs img
-        float compass_line_length = 10;
+        // 
+        // // Compass line
+        // float compass_line_width = 1.5; // not being drawn bc of translation errors in the smaller obs img
+        // float compass_line_length = 10;
         
-        float compass_base_x = ax_painter_dim + 30*cos(agent->rotation+RAND_ROTATE + PI/4);
-        float compass_base_y = ay_painter_dim + 30*sin(agent->rotation+RAND_ROTATE + PI/4);
+        // float compass_base_x = ax_painter_dim + 30*cos(agent->rotation+RAND_ROTATE + PI/4);
+        // float compass_base_y = ay_painter_dim + 30*sin(agent->rotation+RAND_ROTATE + PI/4);
 
-        painter.setBrush(QColor(200, 200, 200));
-        painter.drawEllipse(
-                    compass_base_x - compass_line_length, 
-                    compass_base_y - compass_line_length,
-                    compass_line_length*2,
-                    compass_line_length*2);
+        // painter.setBrush(QColor(200, 200, 200));
+        // painter.drawEllipse(
+        //             compass_base_x - compass_line_length, 
+        //             compass_base_y - compass_line_length,
+        //             compass_line_length*2,
+        //             compass_line_length*2);
 
-        painter.setPen(QPen(QColor(0, 00, 150), compass_line_width, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
-        painter.drawLine(compass_base_x, 
-                            compass_base_y, 
-                            compass_base_x+compass_line_length*cos(wp_abs_angle-PI/2), 
-                            (compass_base_y + compass_line_length*sin(wp_abs_angle-PI/2)));
+        // painter.setPen(QPen(QColor(0, 00, 150), compass_line_width, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
+        // painter.drawLine(compass_base_x, 
+        //                     compass_base_y, 
+        //                     compass_base_x+compass_line_length*cos(wp_abs_angle-PI/2), 
+        //                     (compass_base_y + compass_line_length*sin(wp_abs_angle-PI/2)));
 
                             
 
@@ -816,8 +817,8 @@ class TestGame : public BasicAbstractGame {
         *(float_t *)(info_bufs[info_name_to_offset.at("autopilot_steer")]) = (float) std::clamp(autopilot_steer, -5.f, 5.f);
         *(float_t *)(info_bufs[info_name_to_offset.at("autopilot_throttle")]) = (float) std::clamp(autopilot_throttle, -5.f, 5.f);
 
-        *(float_t *)(info_bufs[info_name_to_offset.at("last_applied_steer")]) = (float) std::clamp(last_applied_steer, -5.f, 5.f);
-        *(float_t *)(info_bufs[info_name_to_offset.at("last_applied_throttle")]) = (float) std::clamp(last_applied_throttle, -5.f, 5.f);
+        *(float_t *)(info_bufs[info_name_to_offset.at("last_applied_steer")]) = (float) 0.0; //std::clamp(last_applied_steer, -5.f, 5.f);
+        *(float_t *)(info_bufs[info_name_to_offset.at("last_applied_throttle")]) = (float) 0.0; // std::clamp(last_applied_throttle, -5.f, 5.f);
 
         *(float_t *)(info_bufs[info_name_to_offset.at("current_speed")]) = (float) std::clamp(current_speed, -5.f, 5.f);
         *(float_t *)(info_bufs[info_name_to_offset.at("dv")]) = (float) dv;
@@ -826,7 +827,7 @@ class TestGame : public BasicAbstractGame {
 
 
 
-        *(float_t *)(info_bufs[info_name_to_offset.at("angle_to_wp")]) = (float) 0.f; //angle_to_target_wp; NOTE THIS HAS BEEN REMOVED!!!!
+        *(float_t *)(info_bufs[info_name_to_offset.at("angle_to_wp")]) = (float) angle_to_target_wp; //NOTE THIS HAS BEEN REMOVED!!!!
         *(int32_t *)(info_bufs[info_name_to_offset.at("collision")]) = (int) collision;
         *(int32_t *)(info_bufs[info_name_to_offset.at("waypoint_infraction")]) = (int) waypoint_infraction;
 
