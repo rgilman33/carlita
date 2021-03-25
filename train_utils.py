@@ -71,17 +71,17 @@ class DataLoader:
 
             autopilot_controls = np.array([[e['autopilot_steer'], e['autopilot_throttle']] for e in info]) # piping back in autopilot to align inputs-outputs.
 
-            # DAGGER
+            # # DAGGER
 
-            # Create dagger controls, toggle it on and off
-            if i % self.DAGGER_CADENCE == 0:
-                self.dagger_counter = 0
-                steer_aug = random.uniform(-.3, .3)
-                #throttle_aug = random.uniform(.5, 1.5)
-                daggerized_controls = np.array([[c[0]+steer_aug, c[1]] for c in autopilot_controls])
-                self.do_dagger = True
-            elif self.dagger_counter == self.DAGGER_DURATION:
-                self.do_dagger = False
+            # # Create dagger controls, toggle it on and off
+            # if i % self.DAGGER_CADENCE == 0:
+            #     self.dagger_counter = 0
+            #     steer_aug = random.uniform(-.3, .3)
+            #     #throttle_aug = random.uniform(.5, 1.5)
+            #     daggerized_controls = np.array([[c[0]+steer_aug, c[1]] for c in autopilot_controls])
+            #     self.do_dagger = True
+            # elif self.dagger_counter == self.DAGGER_DURATION:
+            #     self.do_dagger = False
 
             # Implement control
             if self.do_dagger:
