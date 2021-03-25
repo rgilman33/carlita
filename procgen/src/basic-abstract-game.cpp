@@ -110,8 +110,8 @@ void BasicAbstractGame::initialize_asset_if_necessary(int img_idx) {
 
         std::shared_ptr<QImage> small_image(new QImage(64, 64, QImage::Format_ARGB32));
         asset_ptr = small_image;
-        pgen.generate_resource(asset_ptr, 0, 5, use_block_asset(type));
-        //pgen.make_circle(asset_ptr, 0, 5, use_block_asset(type));
+        //pgen.generate_resource(asset_ptr, 0, 5, use_block_asset(type));
+        pgen.make_circle(asset_ptr, 0, 5, use_block_asset(type));
 
         num_themes = 1;
         aspect_ratio = 1.0;
