@@ -683,11 +683,11 @@ class TestGame : public BasicAbstractGame {
         road_network = RoadNetwork(rand_gen);
 
         options.center_agent = true;
-        options.use_generated_assets = true;
+        options.use_generated_assets = false;
         fish_eaten = 0;
         wps_visited = 0;
 
-        float start_r = .4;
+        float start_r = .8;
 
         if (options.distribution_mode == EasyMode) {
             start_r = 1;
