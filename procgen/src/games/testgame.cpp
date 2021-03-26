@@ -232,7 +232,7 @@ class TestGame : public BasicAbstractGame {
             add_wps_to_route(_upcoming_waypoints, _last_node_id, _current_route_end_node_id);
         }
 
-        float move_thresh = .05;
+        float move_thresh = .03;
         float steer_scale = angle_to_wp / (PI/2); // 90 deg angle results in scale of one.
         float steer = 2.; //TODO vary this
         float autopilot_action_vrot = angle_to_wp > move_thresh ? steer_scale*steer : 
