@@ -479,7 +479,7 @@ public:
 	{
 		//QColor color = QColor(rand_gen.randn(255), rand_gen.randn(255), rand_gen.randn(255)); 
 		painter.save();
-		painter.setOpacity(1.f);
+		painter.setOpacity(.5f);
 		for (Edge &e : edges) {
 			QColor color = QColor("DarkCyan"); 
 			
@@ -520,13 +520,19 @@ public:
 			}
 		}
 		painter.restore();
-
-		// // center line
-		// QColor color = QColor(150,50,150);
-		// painter.setPen(QPen(color, 1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin));
-		// for (Edge &e : edges) {
-		// 	painter.drawPath(e.m_q_path);
+		// color = QColor(rand_gen.randn(255), rand_gen.randn(255), rand_gen.randn(255)); 
+		// painter.setBrush(color);
+		// for (Node &n : nodes) {
+		// 	painter.drawEllipse(n.m_x, n.m_y, LANE_WIDTH/2, LANE_WIDTH/2);
 		// }
+		//color = QColor(rand_gen.randn(255), rand_gen.randn(255), rand_gen.randn(255));
+
+		// center
+		QColor color = QColor(150,50,150);
+		painter.setPen(QPen(color, 1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin));
+		for (Edge &e : edges) {
+			painter.drawPath(e.m_q_path);
+		}
 	}
 
 	vector<Edge> get_outgoing_edges(int node_id) 

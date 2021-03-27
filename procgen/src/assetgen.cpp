@@ -107,7 +107,7 @@ void AssetGen::paint_rect_resource(QPainter &p, QRectF rect, int num_recurse, in
     cgen.rand_gen = rand_gen;
     cgen.roll();
 
-    QColor bgcolor = QColor("Red"); //cgen.rand_color();
+    QColor bgcolor = cgen.rand_color(); //QColor("Red"); //cgen.rand_color();
 
     p.fillRect(rect, bgcolor);
 
@@ -115,7 +115,7 @@ void AssetGen::paint_rect_resource(QPainter &p, QRectF rect, int num_recurse, in
 
     float max_rand_dim = .5 * scale;
     float min_rand_dim = .05 * scale;
-    int num_blotches = 0; //100; //rand_gen->randint(blotch_scale, 2 * blotch_scale); // 1000 is alot
+    int num_blotches = 100; //rand_gen->randint(blotch_scale, 2 * blotch_scale); // 1000 is alot
     float p_recurse = rand_gen->rand01() * .75;
 
     for (int j = 0; j < num_blotches; j++) {
