@@ -107,7 +107,7 @@ void AssetGen::paint_rect_resource(QPainter &p, QRectF rect, int num_recurse, in
     cgen.rand_gen = rand_gen;
     cgen.roll();
 
-    QColor bgcolor = cgen.rand_color(); //QColor("Red"); //cgen.rand_color();
+    QColor bgcolor = QColor("Red"); //cgen.rand_color();
 
     p.fillRect(rect, bgcolor);
 

@@ -10,7 +10,7 @@
 
 using namespace std; 
 
-float LANE_WIDTH = 8; //12;
+float LANE_WIDTH = 12;
 
 // for waypoint types
 const int WP_NORMAL = 0;
@@ -78,7 +78,7 @@ public:
 			QPointF q_point = m_q_path.pointAtPercent(i);
 			float angle = atan2((slightly_previous_point.y() - q_point.y()), (slightly_previous_point.x() - q_point.x() ));
 			angle += 3.14/2.;
-			int edge_distance = 0;//LANE_WIDTH * .75f;
+			int edge_distance = LANE_WIDTH * .75f;
 			float xx = q_point.x() + (edge_distance * cos(angle));
 			float yy = q_point.y() + (edge_distance * sin(angle));
 
@@ -527,7 +527,6 @@ public:
 		// }
 		//color = QColor(rand_gen.randn(255), rand_gen.randn(255), rand_gen.randn(255));
 
-		// center
 		QColor color = QColor(150,50,150);
 		painter.setPen(QPen(color, 1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin));
 		for (Edge &e : edges) {

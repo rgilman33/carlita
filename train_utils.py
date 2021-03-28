@@ -131,7 +131,7 @@ class Flatten(nn.Module):
 
 
 class VizCNN(nn.Module):
-    def __init__(self, use_rnn=False):
+    def __init__(self, use_rnn=False, drop=.1):
         super(VizCNN, self).__init__()
 
         self.pooler = nn.MaxPool2d(kernel_size=2)
@@ -148,6 +148,7 @@ class VizCNN(nn.Module):
         self.bn3 = nn.BatchNorm2d(32*scale)
         self.conv_4a = nn.Conv2d(in_channels=32*scale, out_channels=32*scale, kernel_size=5)
         self.bn4 = nn.BatchNorm2d(32*scale)
+        self.drop = nn.Dropout(drop)
 
         n = 5184 + n_aux # flattened CNN activations + aux
 
@@ -237,6 +238,7 @@ class VizCNN(nn.Module):
 
         features = self.fc0(features)
         features = self.act(features)
+        features = self.drop(features)
 
         # Not in original Distill model
         if self.use_rnn:
@@ -244,6 +246,7 @@ class VizCNN(nn.Module):
 
         features = self.fc1(features)
         features = self.act(features)
+        features = self.drop(features)
 
         features = self.fc2(features)
 
