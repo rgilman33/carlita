@@ -25,7 +25,7 @@ const float DV_NORM = .05;
 const float THROTTLE_NORM = .05;
 const float STEER_NORM = .5;
 
-const int MIN_NODES_THRESHOLD = 15;
+const int MIN_NODES_THRESHOLD = 5; //15;
 
 class TestGame : public BasicAbstractGame {
   public:
@@ -612,12 +612,15 @@ class TestGame : public BasicAbstractGame {
 
 
         // 
-        // // Compass line
-        // float compass_line_width = 1.5; // not being drawn bc of translation errors in the smaller obs img
-        // float compass_line_length = 10;
+        // Compass line
+        float compass_line_width = 1.5; // not being drawn bc of translation errors in the smaller obs img
+        float compass_line_length = 10;
         
         // float compass_base_x = ax_painter_dim + 30*cos(agent->rotation+RAND_ROTATE + PI/4);
         // float compass_base_y = ay_painter_dim + 30*sin(agent->rotation+RAND_ROTATE + PI/4);
+
+        float compass_base_x = ax_painter_dim;
+        float compass_base_y = ay_painter_dim;
 
         // painter.setBrush(QColor(200, 200, 200));
         // painter.drawEllipse(
@@ -626,11 +629,11 @@ class TestGame : public BasicAbstractGame {
         //             compass_line_length*2,
         //             compass_line_length*2);
 
-        // painter.setPen(QPen(QColor(0, 00, 150), compass_line_width, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
-        // painter.drawLine(compass_base_x, 
-        //                     compass_base_y, 
-        //                     compass_base_x+compass_line_length*cos(wp_abs_angle-PI/2), 
-        //                     (compass_base_y + compass_line_length*sin(wp_abs_angle-PI/2)));
+        painter.setPen(QPen(QColor(0, 00, 150), compass_line_width, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
+        painter.drawLine(compass_base_x, 
+                            compass_base_y, 
+                            compass_base_x+compass_line_length*cos(wp_abs_angle-PI/2), 
+                            (compass_base_y + compass_line_length*sin(wp_abs_angle-PI/2)));
 
                             
 

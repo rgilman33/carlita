@@ -10,7 +10,7 @@
 
 using namespace std; 
 
-float LANE_WIDTH = 12;
+float LANE_WIDTH = 8;//12;
 
 // for waypoint types
 const int WP_NORMAL = 0;
@@ -78,7 +78,7 @@ public:
 			QPointF q_point = m_q_path.pointAtPercent(i);
 			float angle = atan2((slightly_previous_point.y() - q_point.y()), (slightly_previous_point.x() - q_point.x() ));
 			angle += 3.14/2.;
-			int edge_distance = LANE_WIDTH * .75f;
+			int edge_distance = 0;//LANE_WIDTH * .75f;
 			float xx = q_point.x() + (edge_distance * cos(angle));
 			float yy = q_point.y() + (edge_distance * sin(angle));
 
@@ -139,7 +139,7 @@ public:
 	float width = 500.0f;
 	float height = 500.0f;
 
-	float MIN_INTERSECTION_ANGLE = 60.0f;
+	float MIN_INTERSECTION_ANGLE = 80.f;//60.0f;
 	float BASE_EDGE_DISTANCE = width / 8.0f;
 	float MIN_MERGE_DISTANCE = BASE_EDGE_DISTANCE * 1.8f;
 	float MIN_ALLOWABLE_DIST = BASE_EDGE_DISTANCE * 1.f;
@@ -479,9 +479,9 @@ public:
 	{
 		//QColor color = QColor(rand_gen.randn(255), rand_gen.randn(255), rand_gen.randn(255)); 
 		painter.save();
-		painter.setOpacity(.5f);
+		painter.setOpacity(1.f);
 		for (Edge &e : edges) {
-			QColor color = QColor("DarkCyan"); 
+			QColor color = QColor("Green"); 
 			
 			painter.setPen(QPen(color, LANE_WIDTH*2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 			painter.drawPath(e.m_q_path);
@@ -520,18 +520,13 @@ public:
 			}
 		}
 		painter.restore();
-		// color = QColor(rand_gen.randn(255), rand_gen.randn(255), rand_gen.randn(255)); 
-		// painter.setBrush(color);
-		// for (Node &n : nodes) {
-		// 	painter.drawEllipse(n.m_x, n.m_y, LANE_WIDTH/2, LANE_WIDTH/2);
-		// }
-		//color = QColor(rand_gen.randn(255), rand_gen.randn(255), rand_gen.randn(255));
 
-		QColor color = QColor(150,50,150);
-		painter.setPen(QPen(color, 1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin));
-		for (Edge &e : edges) {
-			painter.drawPath(e.m_q_path);
-		}
+		// // center line
+		// QColor color = QColor(150,50,150);
+		// painter.setPen(QPen(color, 1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin));
+		// for (Edge &e : edges) {
+		// 	painter.drawPath(e.m_q_path);
+		// }
 	}
 
 	vector<Edge> get_outgoing_edges(int node_id) 
