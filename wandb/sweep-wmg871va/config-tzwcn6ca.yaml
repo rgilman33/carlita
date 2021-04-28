@@ -1,0 +1,27 @@
+wandb_version: 1
+
+background_noise_level_indist:
+  value: 10
+background_noise_level_outdist:
+  value: 100
+bs:
+  value: 64
+color_theme_indist:
+  value:
+  - 0
+  - 1
+  - 2
+color_theme_outdist:
+  value:
+  - 0
+  - 1
+  - 2
+color_theme_road_indist:
+  value:
+  - 6
+  - 7
+color_theme_road_outdist:
+  value:
+  - 0
+  - 1
+  - 2

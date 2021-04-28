@@ -10,7 +10,7 @@
 
 using namespace std; 
 
-float LANE_WIDTH = 8;//12;
+float LANE_WIDTH = 12;
 
 // for waypoint types
 const int WP_NORMAL = 0;
@@ -18,6 +18,7 @@ const int WP_STOP_SIGN = 1;
 const int WP_AVOIDING_OBSTACLE = 2;
 
 const float OBSTACLE_PROB = 0.f;
+const float STOP_SIGN_PROB = 0.0f;
 
 
 class Node;
@@ -78,7 +79,7 @@ public:
 			QPointF q_point = m_q_path.pointAtPercent(i);
 			float angle = atan2((slightly_previous_point.y() - q_point.y()), (slightly_previous_point.x() - q_point.x() ));
 			angle += 3.14/2.;
-			int edge_distance = 0;//LANE_WIDTH * .75f;
+			int edge_distance = LANE_WIDTH * .75f;
 			float xx = q_point.x() + (edge_distance * cos(angle));
 			float yy = q_point.y() + (edge_distance * sin(angle));
 
@@ -139,17 +140,19 @@ public:
 	float width = 500.0f;
 	float height = 500.0f;
 
-	float MIN_INTERSECTION_ANGLE = 80.f;//60.0f;
+	float MIN_INTERSECTION_ANGLE = 60.0f;
 	float BASE_EDGE_DISTANCE = width / 8.0f;
 	float MIN_MERGE_DISTANCE = BASE_EDGE_DISTANCE * 1.8f;
 	float MIN_ALLOWABLE_DIST = BASE_EDGE_DISTANCE * 1.f;
 
 	float MARGIN = width / 20.f;
 	
-	int NUM_GROW_ITERS = 500;
+	int NUM_GROW_ITERS = 200;
+	QColor road_color;
 
 	RoadNetwork () {}
-	RoadNetwork (RandGen & rand_gen_in) : rand_gen (rand_gen_in) {}
+	RoadNetwork (RandGen & rand_gen_in, QColor road_color_in) : rand_gen (rand_gen_in), road_color (road_color_in) 
+	{}
 
 	int add_node(Node &node) 
 	{ 
@@ -169,9 +172,15 @@ public:
 		vector<int> neighboring_nodes;
 		for (Edge &e : edges) {
 			if (e.m_n1==n.node_id){
-				neighboring_nodes.push_back(e.m_n2);
+				int mn2 = e.m_n2;
+				neighboring_nodes.push_back(mn2);
 			} else if (e.m_n2==n.node_id) {
-				neighboring_nodes.push_back(e.m_n1);
+				int mn1 = e.m_n1;
+				if (mn1 < 0 | mn1 > INT16_MAX) {
+					std::cout<<"What the hell impossible node id";
+				} else {
+					neighboring_nodes.push_back(mn1);
+				}
 			}
 		}
 		return neighboring_nodes;
@@ -272,10 +281,10 @@ public:
 	void trim_danglers() {
 		// Get rid of reverse edges or duplicates. DOESN"T DO ANYTHING
 		for (int i = edges.size()-1; i >= 0; i--) {
-			Edge &e = edges[i];
+			Edge &e = edges.at(i);
 
 			for (int ii = i-1; ii>=0; ii--) {
-				Edge &o = edges[ii];
+				Edge &o = edges.at(ii);
 				if ((e.m_n1==o.m_n2 && e.m_n2==o.m_n1) || (e.m_n1==o.m_n1 && e.m_n2==o.m_n2)) {
 					edges.erase(edges.begin()+i);
 					//cout<<"found double edge";
@@ -304,8 +313,8 @@ public:
 			// Get rid of dangling nodes
 			vector<int> removed_nodes;
 			for (int i = nodes.size()-1; i >= 0; i--) {
-				if (get_neighboring_nodes(nodes[i]).size()==1) {
-					removed_nodes.push_back(nodes[i].node_id);
+				if (get_neighboring_nodes(nodes.at(i)).size()==1) {
+					removed_nodes.push_back(nodes.at(i).node_id);
 					nodes.erase(nodes.begin()+i);
 				}
 			}
@@ -324,6 +333,10 @@ public:
 	{
 		nodes.clear(); 
 		edges.clear();
+
+		edges.reserve(10000);
+		nodes.reserve(10000); // this appears to solve a bug? was getting segfault few lines below when adding first edge to edges. Only sometimes. 
+
 		node_id_counter = 0;
 
 		// Initial spine
@@ -356,7 +369,7 @@ public:
 		//////////////////////////////////
 		// Growing segments off the spine
 		for (int i=0; i<NUM_GROW_ITERS; i++){
-			Node &n4 = nodes[rand_gen.randn(nodes.size())];
+			Node &n4 = nodes.at(rand_gen.randn(nodes.size()));
 
 			float angle = rand_gen.randrange(.0f, 6.28f);
 			int edge_distance = rand_gen.randint(BASE_EDGE_DISTANCE, BASE_EDGE_DISTANCE*1.5); 
@@ -398,8 +411,8 @@ public:
 				}
 				if (close_nodes.size() > 0){ 
 					// If close node, check to see if makes an acceptable angle
-					int ix = close_nodes[rand_gen.randn(close_nodes.size())];
-					n6 = nodes[ix]; 
+					int ix = close_nodes.at(rand_gen.randn(close_nodes.size()));
+					n6 = nodes.at(ix); 
 					using_existing_node = true;
 					if (angle_too_small(n6, n5) || angle_too_small(n5, n6)) { continue; }
 				} else {
@@ -456,8 +469,6 @@ public:
 			e.m_q_path.cubicTo(e.b1, e.b2, e.n2_node.q_point);
 		}
 
-		float STOP_SIGN_PROB = 0.;
-
 		for (Edge &e : edges) {
 			Node end_node = get_node(e.m_n2);
 			int num_outgoing_edges = get_neighboring_nodes(end_node).size();
@@ -477,12 +488,11 @@ public:
 
 	void draw (QPainter &painter) 
 	{
-		//QColor color = QColor(rand_gen.randn(255), rand_gen.randn(255), rand_gen.randn(255)); 
+		QColor color = road_color; //QColor(rand_gen.randint(200,255), rand_gen.randint(200, 255), rand_gen.randint(200, 255)); 
 		painter.save();
-		painter.setOpacity(1.f);
+		painter.setOpacity(.7);
 		for (Edge &e : edges) {
-			QColor color = QColor("Green"); 
-			
+			//QColor color = QColor("Green"); 
 			painter.setPen(QPen(color, LANE_WIDTH*2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 			painter.drawPath(e.m_q_path);
 		}
@@ -521,12 +531,12 @@ public:
 		}
 		painter.restore();
 
-		// // center line
-		// QColor color = QColor(150,50,150);
-		// painter.setPen(QPen(color, 1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin));
-		// for (Edge &e : edges) {
-		// 	painter.drawPath(e.m_q_path);
-		// }
+		// center line
+		color = QColor(std::max(road_color.red()-10, 0), std::max(road_color.green()-10, 0), std::max(road_color.blue()-10, 0));
+		painter.setPen(QPen(color, 1, Qt::DashLine, Qt::FlatCap, Qt::MiterJoin));
+		for (Edge &e : edges) {
+			painter.drawPath(e.m_q_path);
+		}
 	}
 
 	vector<Edge> get_outgoing_edges(int node_id) 
@@ -559,6 +569,8 @@ public:
 			}
 		}
 		// flag if nothing returned
+		std::cout << "no node?";
+		//return nodes.at(0);
 	}
 
 	Edge& get_edge(int node_id_1, int node_id_2) 

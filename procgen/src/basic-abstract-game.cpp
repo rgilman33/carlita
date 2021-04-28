@@ -786,8 +786,10 @@ void BasicAbstractGame::game_reset() {
 
     AssetGen bggen(&rand_gen);
 
+    int color_theme = options.color_theme;
+    int background_noise_level = options.background_noise_level;
     if (use_procgen_background) {
-        bggen.generate_resource(main_bg_images_ptr->at(background_index));
+        bggen.generate_resource(main_bg_images_ptr->at(background_index), color_theme, background_noise_level);
     }
 
     entities.clear();
@@ -1017,7 +1019,6 @@ void BasicAbstractGame::draw_background(QPainter &p, const QRect &rect) {
     QRectF main_rect = get_screen_rect(0, main_height, main_width, main_height);
 
     std::shared_ptr<QImage> background_image = main_bg_images_ptr->at(background_index);
-
     if (bg_tile_ratio < 0) {
         tile_image(p, background_image.get(), main_rect, bg_tile_ratio);
     } else {

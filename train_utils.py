@@ -28,9 +28,12 @@ class DataLoader:
         self.do_dagger = False
         self.dagger_counter = 0
 
-
         self.env = ProcgenGym3Env(num=bs, env_name="testgame") if not env else env
         self.queue_up_chunk()
+
+    def destroy(self):
+        self.env.close()
+        del self.queued_chunks, self.env
 
     
     def get_chunk(self):
@@ -112,7 +115,7 @@ class DataLoader:
                                     aux_container, 
                                     targets_container))
         
-        print(f"Queueing chunk of size {front_container.shape} took {np.round(time.time() - t1, 2)} seconds")  
+        #print(f"Queueing chunk of size {front_container.shape} took {np.round(time.time() - t1, 2)} seconds")  
 
 
 
@@ -139,15 +142,15 @@ class VizCNN(nn.Module):
         scale = 2
 
         self.conv_1a = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=7)
-        self.bn1 = nn.BatchNorm2d(16)
+        self.bn1 = nn.BatchNorm2d(16); self.bn1_ = nn.BatchNorm2d(16)
         self.conv_2a = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=5)
-        self.bn2a = nn.BatchNorm2d(32)
+        self.bn2a = nn.BatchNorm2d(32); self.bn2a_ = nn.BatchNorm2d(32)
         self.conv_2b = nn.Conv2d(in_channels=32, out_channels=32*scale, kernel_size=5)
-        self.bn2b = nn.BatchNorm2d(32*scale)
+        self.bn2b = nn.BatchNorm2d(32*scale); self.bn2b_ = nn.BatchNorm2d(32*scale)
         self.conv_3a = nn.Conv2d(in_channels=32*scale, out_channels=32*scale, kernel_size=5)
-        self.bn3 = nn.BatchNorm2d(32*scale)
+        self.bn3 = nn.BatchNorm2d(32*scale);self.bn3_ = nn.BatchNorm2d(32*scale)
         self.conv_4a = nn.Conv2d(in_channels=32*scale, out_channels=32*scale, kernel_size=5)
-        self.bn4 = nn.BatchNorm2d(32*scale)
+        self.bn4 = nn.BatchNorm2d(32*scale); self.bn4_ = nn.BatchNorm2d(32*scale)
         self.drop = nn.Dropout(drop)
 
         n = 5184 + n_aux # flattened CNN activations + aux
@@ -170,7 +173,7 @@ class VizCNN(nn.Module):
     def get_activations_gradient(self):
         return self.gradients
         
-    def forward(self, x, aux, hidden, return_salmap=False, register_activations=False):
+    def forward(self, x, aux, hidden, return_salmap=False, register_activations=False, is_src_domain=True):
 
         # 7x7 convolutional layer with 16 channels (layer 1a)
         # 2x2 L2 pooling layer
@@ -197,16 +200,16 @@ class VizCNN(nn.Module):
         aux = aux.view(seq_len*bs, n_aux)
 
         x = self.conv_1a(x)
-        x = self.bn1(x)
+        x = self.bn1(x) if is_src_domain else self.bn1_(x)
         x = self.act(x)
         #x = self.pooler(x)
 
         x = self.conv_2a(x)
-        x = self.bn2a(x)
+        x = self.bn2a(x) if is_src_domain else self.bn2a_(x)
         x = self.act(x) # Why was this activation missing?
 
         x = self.conv_2b(x)
-        x = self.bn2b(x)
+        x = self.bn2b(x) if is_src_domain else self.bn2b_(x)
         #x = self.pooler(x)
         x = self.act(x)
 
@@ -220,12 +223,12 @@ class VizCNN(nn.Module):
         ################
 
         x = self.conv_3a(x)
-        x = self.bn3(x)
+        x = self.bn3(x) if is_src_domain else self.bn3_(x)
         x = self.pooler(x)
         x = self.act(x)
 
         x = self.conv_4a(x)
-        x = self.bn4(x)
+        x = self.bn4(x) if is_src_domain else self.bn4_(x)
         x = self.pooler(x)
         x = self.act(x)
 
@@ -259,7 +262,22 @@ class VizCNN(nn.Module):
 
 
 
-
+class Logger():
+    def __init__(self):
+        self.tracker = {}
+        
+    def log(self, to_log):
+        for k,v in to_log.items():
+            if k in self.tracker:
+                self.tracker[k].append(v)
+            else:
+                self.tracker[k] = [v]
+    
+    def finish(self):
+        r = self.tracker
+        for k in r: r[k] = np.round(np.array(r[k]).mean(), 5)
+        self.tracker = {}
+        return r
 
 
 

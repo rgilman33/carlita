@@ -5,6 +5,8 @@
 #include <queue>
 #include <cmath>
 
+// python -m procgen.interactive --env-name testgame
+
 const std::string NAME = "testgame";
 
 const int COMPLETION_BONUS = 10.0f;
@@ -25,7 +27,12 @@ const float DV_NORM = .05;
 const float THROTTLE_NORM = .05;
 const float STEER_NORM = .5;
 
-const int MIN_NODES_THRESHOLD = 5; //15;
+const int MIN_NODES_THRESHOLD = 15;
+
+const int NUM_NPCS = 0;//20;
+const bool DRAW_COMPASS = true;
+
+bool USE_AUTOPILOT = true;
 
 class TestGame : public BasicAbstractGame {
   public:
@@ -42,8 +49,6 @@ class TestGame : public BasicAbstractGame {
     int waypoint_infraction = 0;
 
     float RAND_ROTATE;
-
-    bool USE_AUTOPILOT = false;
 
     float front_angle = 0;
     
@@ -88,11 +93,12 @@ class TestGame : public BasicAbstractGame {
     // or need to make sure our scaling dynamically responds to img size. We weren't doing
     // this before, causing the need for magic numbers in our scaling. Either use procgen 
     // backgrounds of uniform 500., or make scaling dynamic to first read from the background img dim.
-    // Or crop all imgs dynamically to be 500 x 500. 
+    // Or crop all imgs dynamically to be 500 x 500. DONE. comment out for procgen, leave in for imgs
 
-    // void load_background_images() override {
-    //     main_bg_images_ptr = &water_backgrounds;
-    // }
+    void load_background_images() override {
+        //main_bg_images_ptr = &water_backgrounds;
+        //main_bg_images_ptr = &platform_backgrounds;
+    }
 
     void asset_for_type(int type, std::vector<std::string> &names) override {
         if (type == PLAYER) {
@@ -230,6 +236,12 @@ class TestGame : public BasicAbstractGame {
         int ADD_MORE_WPS_TRIGGER = 30;
         if (_upcoming_waypoints.size() < ADD_MORE_WPS_TRIGGER) {
             add_wps_to_route(_upcoming_waypoints, _last_node_id, _current_route_end_node_id);
+        }
+
+        // Don't turn when stopped
+        float _current_speed = sqrt(ent->vx*ent->vx + ent->vy*ent->vy);
+        if (_current_speed < .2) {
+            return 0;
         }
 
         float move_thresh = .03;
@@ -611,29 +623,32 @@ class TestGame : public BasicAbstractGame {
         // we rotate and translate the painter
 
 
-        // // 
-        // // Compass line
-        // float compass_line_width = 1.5; // not being drawn bc of translation errors in the smaller obs img
-        // float compass_line_length = 10;
-        
-        // // float compass_base_x = ax_painter_dim + 30*cos(agent->rotation+RAND_ROTATE + PI/4);
-        // // float compass_base_y = ay_painter_dim + 30*sin(agent->rotation+RAND_ROTATE + PI/4);
+        // 
+        // Compass line
+        if (DRAW_COMPASS) {
+            float compass_line_width = 1.5; // not being drawn bc of translation errors in the smaller obs img
+            float compass_line_length = 10;
+            
+            float compass_base_x = ax_painter_dim + 30*cos(agent->rotation+RAND_ROTATE + PI/4);
+            float compass_base_y = ay_painter_dim + 30*sin(agent->rotation+RAND_ROTATE + PI/4);
 
-        // float compass_base_x = ax_painter_dim;
-        // float compass_base_y = ay_painter_dim;
+            //float compass_base_x = ax_painter_dim;
+            //float compass_base_y = ay_painter_dim;
 
-        // // painter.setBrush(QColor(200, 200, 200));
-        // // painter.drawEllipse(
-        // //             compass_base_x - compass_line_length, 
-        // //             compass_base_y - compass_line_length,
-        // //             compass_line_length*2,
-        // //             compass_line_length*2);
+            painter.setBrush(QColor(200, 200, 200));
+            painter.drawEllipse(
+                        compass_base_x - compass_line_length, 
+                        compass_base_y - compass_line_length,
+                        compass_line_length*2,
+                        compass_line_length*2);
 
-        // painter.setPen(QPen(QColor(0, 00, 150), compass_line_width, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
-        // painter.drawLine(compass_base_x, 
-        //                     compass_base_y, 
-        //                     compass_base_x+compass_line_length*cos(wp_abs_angle-PI/2), 
-        //                     (compass_base_y + compass_line_length*sin(wp_abs_angle-PI/2)));
+            painter.setPen(QPen(QColor(0, 00, 150), compass_line_width, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
+            painter.drawLine(compass_base_x, 
+                                compass_base_y, 
+                                compass_base_x+compass_line_length*cos(wp_abs_angle-PI/2), 
+                                (compass_base_y + compass_line_length*sin(wp_abs_angle-PI/2)));
+        }
+
 
                             
 
@@ -670,6 +685,9 @@ class TestGame : public BasicAbstractGame {
     void game_reset() override {
         BasicAbstractGame::game_reset();
 
+        AssetGen bggen(&rand_gen);
+        QColor road_color = bggen.get_rand_color(options.color_theme_road);
+
           /* initialize random seed: */
         srand (time(NULL));
         int ss = rand();
@@ -683,7 +701,7 @@ class TestGame : public BasicAbstractGame {
 
         front_angle = RAND_ROTATE;
 
-        road_network = RoadNetwork(rand_gen);
+        road_network = RoadNetwork(rand_gen, road_color);
 
         options.center_agent = true;
         options.use_generated_assets = true;
@@ -750,7 +768,7 @@ class TestGame : public BasicAbstractGame {
         upcoming_waypoints_npcs.clear();
         brake_npcs.clear();
 
-        int NUM_NPCS = 0; //ceil((road_network.nodes.size()-1) / .8);
+         //ceil((road_network.nodes.size()-1) / .8);
         for (int i = 0; i<NUM_NPCS; i++) {
 
             brake_npcs.push_back(false);

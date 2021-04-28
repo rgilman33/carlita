@@ -222,6 +222,9 @@ class ProcgenGym3Env(BaseProcgenEnv):
         use_generated_assets=False,
         paint_vel_info=False,
         distribution_mode="hard",
+        color_theme=[0,1,2,3,4,5,6,7],
+        color_theme_road=[0,1,2,3,4,5,6,7],
+        background_noise_level=100,
         **kwargs,
     ):
         assert (
@@ -241,6 +244,12 @@ class ProcgenGym3Env(BaseProcgenEnv):
         else:
             distribution_mode = DISTRIBUTION_MODE_DICT[distribution_mode]
 
+        # Env takes in list like [1,2,3] bc that's friendlier but for translating to c++
+        # pasing in as int like 123
+        ltoi = lambda l: int(''.join([str(n) for n in sorted(l, reverse=True)]))
+        color_theme = ltoi(color_theme)
+        color_theme_road = ltoi(color_theme_road)
+
         options = {
                 "center_agent": bool(center_agent),
                 "use_generated_assets": bool(use_generated_assets),
@@ -249,6 +258,9 @@ class ProcgenGym3Env(BaseProcgenEnv):
                 "use_backgrounds": bool(use_backgrounds),
                 "paint_vel_info": bool(paint_vel_info),
                 "distribution_mode": distribution_mode,
+                "color_theme":color_theme,
+                "color_theme_road":color_theme_road,
+                "background_noise_level":background_noise_level,
             }
         super().__init__(num, env_name, options, **kwargs)
 

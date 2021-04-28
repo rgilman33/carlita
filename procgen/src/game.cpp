@@ -66,6 +66,19 @@ void Game::parse_options(std::string name, VecOptions opts) {
         fatal("invalid distribution_mode %d\n", options.distribution_mode);
     }
 
+    int color_theme = 6;
+    opts.consume_int("color_theme", &color_theme);
+    options.color_theme = color_theme;
+
+
+    int color_theme_road = 6;
+    opts.consume_int("color_theme_road", &color_theme_road);
+    options.color_theme_road = color_theme_road;
+
+    int background_noise_level = 6;
+    opts.consume_int("background_noise_level", &background_noise_level);
+    options.background_noise_level = background_noise_level;
+
     // coinrun_old
     opts.consume_int("plain_assets", &options.plain_assets);
     opts.consume_int("physics_mode", &options.physics_mode);
@@ -181,6 +194,9 @@ void Game::serialize(WriteBuffer *b) {
     b->write_int(options.center_agent);
     b->write_int(options.debug_mode);
     b->write_int(options.distribution_mode);
+    b->write_int(options.color_theme); //
+    b->write_int(options.color_theme_road); //
+    b->write_int(options.background_noise_level);
     b->write_int(options.use_sequential_levels);
 
     b->write_int(options.use_easy_jump);
@@ -246,6 +262,9 @@ void Game::deserialize(ReadBuffer *b) {
     options.center_agent = b->read_int();
     options.debug_mode = b->read_int();
     options.distribution_mode = DistributionMode(b->read_int());
+    options.color_theme = b->read_int(); //RG 
+    options.color_theme_road = b->read_int(); //RG 
+    options.background_noise_level = b->read_int();
     options.use_sequential_levels = b->read_int();
 
     options.use_easy_jump = b->read_int();

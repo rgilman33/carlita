@@ -18,7 +18,7 @@ std::shared_ptr<QImage> get_asset_ptr(std::string relpath) {
 
 std::shared_ptr<QImage> load_resource_ptr(std::string relpath, QImage::Format format) {
     auto path = global_resource_root + relpath;
-    auto asset = QImage(QString(path.c_str())).convertToFormat(format);
+    auto asset = QImage(QString(path.c_str())).convertToFormat(format).scaled(500,500); // RG the scaled here makes it so things line up
     auto asset_ptr = std::make_shared<QImage>(asset);
 
     if (asset_ptr->width() == 0) {

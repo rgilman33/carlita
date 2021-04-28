@@ -1,4 +1,5 @@
 #include "assetgen.h"
+#include <iostream>
 
 struct ColorGen {
     RandGen *rand_gen;
@@ -72,7 +73,7 @@ std::vector<QRectF> AssetGen::split_rect(QRectF rect, int num_splits, bool is_ho
     return split_rects;
 }
 
-void AssetGen::paint_shape(QPainter &p, QRectF main_rect, ColorGen *cgen) {
+void AssetGen::paint_shape(QPainter &p, QRectF main_rect, ColorGen *cgen, int color_theme) {
     int k = rand_gen->randn(10);
     int num_splits = (k * k) / 50 + 1;
     std::vector<QRectF> split_rects = split_rect(main_rect, num_splits, rand_gen->randbool());
@@ -80,13 +81,13 @@ void AssetGen::paint_shape(QPainter &p, QRectF main_rect, ColorGen *cgen) {
     bool use_rect = rand_gen->randbool();
     bool regen_colors = rand_gen->randbool();
 
-    QColor c1 = cgen->rand_color();
-    QColor c2 = cgen->rand_color();
+    QColor c1 = get_rand_color(color_theme); //cgen->rand_color();
+    QColor c2 = get_rand_color(color_theme); //cgen->rand_color();
 
     for (QRectF rect : split_rects) {
         if (regen_colors) {
-            c1 = cgen->rand_color();
-            c2 = cgen->rand_color();
+            c1 = get_rand_color(color_theme); //cgen->rand_color();
+            c2 = get_rand_color(color_theme); //cgen->rand_color();
         }
 
         if (use_rect) {
@@ -101,13 +102,46 @@ void AssetGen::paint_shape(QPainter &p, QRectF main_rect, ColorGen *cgen) {
     }
 }
 
-void AssetGen::paint_rect_resource(QPainter &p, QRectF rect, int num_recurse, int blotch_scale) {
+QColor AssetGen::get_rand_color(int color_themes) {
+    QColor color;
+
+    std::vector<int> colors;
+
+    while (color_themes > 0)
+    {
+        int digit = color_themes % 10;
+        color_themes /= 10;
+        colors.push_back(digit);
+    }
+    int color_theme = colors.at(rand_gen->randn(colors.size()));
+
+    if (color_theme==0) {
+        color = QColor(rand_gen->randint(0,100), rand_gen->randint(0,100), rand_gen->randint(0,100));
+    } else if (color_theme==1) {
+        color = QColor(rand_gen->randint(0,100), rand_gen->randint(0,100), rand_gen->randint(175, 255));
+    } else if (color_theme==2) {
+        color = QColor(rand_gen->randint(175, 255), rand_gen->randint(0,100), rand_gen->randint(0,100));
+    } else if (color_theme==3) {
+        color = QColor(rand_gen->randint(0,100), rand_gen->randint(175,255), rand_gen->randint(0,100));
+    } else if (color_theme==4) {
+        color = QColor(rand_gen->randint(0,100), rand_gen->randint(175,255), rand_gen->randint(175,255));
+    } else if (color_theme==5) {
+        color = QColor(rand_gen->randint(175, 255), rand_gen->randint(0,100), rand_gen->randint(175, 255));
+    } else if (color_theme==6) {
+        color = QColor(rand_gen->randint(175, 255), rand_gen->randint(175,255), rand_gen->randint(175,255));
+    } else if (color_theme==7) {
+        color = QColor(rand_gen->randint(175, 255), rand_gen->randint(175,255), rand_gen->randint(0,100));
+    };
+    return color;
+}
+
+void AssetGen::paint_rect_resource(QPainter &p, QRectF rect, int num_recurse, int blotch_scale, int color_theme, int background_noise_level) {
     // Paints background
     ColorGen cgen;
     cgen.rand_gen = rand_gen;
     cgen.roll();
 
-    QColor bgcolor = QColor("Red"); //cgen.rand_color();
+    QColor bgcolor = get_rand_color(color_theme); //cgen.rand_color();
 
     p.fillRect(rect, bgcolor);
 
@@ -115,16 +149,16 @@ void AssetGen::paint_rect_resource(QPainter &p, QRectF rect, int num_recurse, in
 
     float max_rand_dim = .5 * scale;
     float min_rand_dim = .05 * scale;
-    int num_blotches = 0;//100; //rand_gen->randint(blotch_scale, 2 * blotch_scale); // 1000 is alot
+    int num_blotches = background_noise_level; //rand_gen->randint(blotch_scale, 2 * blotch_scale); // 1000 is alot
     float p_recurse = rand_gen->rand01() * .75;
 
     for (int j = 0; j < num_blotches; j++) {
         QRectF dst3 = choose_sub_rect(rect, min_rand_dim, max_rand_dim);
 
         if ((num_recurse > 0) && (rand_gen->rand01() < p_recurse)) {
-            paint_rect_resource(p, dst3, num_recurse - 1, 10);
+            paint_rect_resource(p, dst3, num_recurse - 1, 10, color_theme, background_noise_level);
         } else {
-            paint_shape(p, dst3, &cgen);
+            paint_shape(p, dst3, &cgen, color_theme);
         }
     }
 
@@ -149,7 +183,7 @@ QRectF AssetGen::create_bar(QRectF rect, bool is_horizontal) {
     return crect;
 }
 
-void AssetGen::paint_shape_resource(QPainter &p, QRectF rect) {
+void AssetGen::paint_shape_resource(QPainter &p, QRectF rect, int color_theme) {
     ColorGen cgen;
     
     cgen.rand_gen = rand_gen;
@@ -169,12 +203,12 @@ void AssetGen::paint_shape_resource(QPainter &p, QRectF rect) {
 
     for (int i = 0; i < nbar1; i++) {
         QRectF c1 = create_bar(rect, horizontal_first);
-        paint_shape(p, c1, &cgen);
+        paint_shape(p, c1, &cgen, color_theme);
     }
 
     for (int i = 0; i < nbar2; i++) {
         QRectF c2 = create_bar(rect, !horizontal_first);
-        paint_shape(p, c2, &cgen);
+        paint_shape(p, c2, &cgen, color_theme);
     }
 
     int num_blotches = rand_gen->randint(1, 5);
@@ -182,7 +216,7 @@ void AssetGen::paint_shape_resource(QPainter &p, QRectF rect) {
     for (int j = 0; j < num_blotches; j++) {
         QRectF dst = choose_sub_rect(rect, 0.1f, 0.6f);
 
-        paint_shape(p, dst, &cgen);
+        paint_shape(p, dst, &cgen, color_theme);
     }
 
     p.restore();
@@ -190,14 +224,14 @@ void AssetGen::paint_shape_resource(QPainter &p, QRectF rect) {
 
 
 
-void AssetGen::generate_resource(std::shared_ptr<QImage> img, int num_recurse, int blotch_scale, bool is_rect) {
+void AssetGen::generate_resource(std::shared_ptr<QImage> img, int color_theme, int background_noise_level, int num_recurse, int blotch_scale, bool is_rect) {
     QPainter p(img.get());
     QRectF rect = QRectF(0, 0, img->width(), img->height());
 
     if (is_rect) {
-        paint_rect_resource(p, rect, num_recurse, blotch_scale);
+        paint_rect_resource(p, rect, num_recurse, blotch_scale, color_theme, background_noise_level);
     } else {
-        paint_shape_resource(p, rect);
+        paint_shape_resource(p, rect, color_theme);
     }
 }
 

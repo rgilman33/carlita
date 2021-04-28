@@ -57,6 +57,11 @@ struct GameOptions {
     bool use_easy_jump = false;
     int plain_assets = 0;
     int physics_mode = 0;
+
+    // RG
+    int color_theme = 3;
+    int color_theme_road = 3;
+    int background_noise_level = 100;
 };
 
 class Game {
