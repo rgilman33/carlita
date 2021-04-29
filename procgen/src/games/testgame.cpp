@@ -32,7 +32,7 @@ const int MIN_NODES_THRESHOLD = 15;
 const int NUM_NPCS = 0;//20;
 const bool DRAW_COMPASS = true;
 
-bool USE_AUTOPILOT = true;
+bool USE_AUTOPILOT = false;
 
 class TestGame : public BasicAbstractGame {
   public:
