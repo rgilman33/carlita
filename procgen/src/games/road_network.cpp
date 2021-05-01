@@ -490,7 +490,7 @@ public:
 	{
 		QColor color = road_color; //QColor(rand_gen.randint(200,255), rand_gen.randint(200, 255), rand_gen.randint(200, 255)); 
 		painter.save();
-		painter.setOpacity(.7);
+		painter.setOpacity(1.0);
 		for (Edge &e : edges) {
 			//QColor color = QColor("Green"); 
 			painter.setPen(QPen(color, LANE_WIDTH*2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
