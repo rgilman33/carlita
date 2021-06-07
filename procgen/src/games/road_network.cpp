@@ -149,9 +149,11 @@ public:
 	
 	int NUM_GROW_ITERS = 200;
 	QColor road_color;
+	QColor sidewalk_color;
 
 	RoadNetwork () {}
-	RoadNetwork (RandGen & rand_gen_in, QColor road_color_in) : rand_gen (rand_gen_in), road_color (road_color_in) 
+	RoadNetwork (RandGen & rand_gen_in, QColor road_color_in, QColor sidewalk_color_in) 
+			: rand_gen (rand_gen_in), road_color (road_color_in), sidewalk_color (sidewalk_color_in)
 	{}
 
 	int add_node(Node &node) 
@@ -489,6 +491,15 @@ public:
 	void draw (QPainter &painter) 
 	{
 		QColor color = road_color; //QColor(rand_gen.randint(200,255), rand_gen.randint(200, 255), rand_gen.randint(200, 255)); 
+
+		// Sidewalk / shoulder
+		painter.save();
+		painter.setPen(QPen(sidewalk_color, LANE_WIDTH*2*2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+		for (Edge &e : edges) {
+			painter.drawPath(e.m_q_path);
+		}
+		painter.restore();
+
 		painter.save();
 		painter.setOpacity(1.0);
 		for (Edge &e : edges) {
@@ -499,7 +510,10 @@ public:
 		painter.restore();
 
 		painter.save();
+		
 		for (Edge &e : edges) {
+			// Stopsigns
+
 			//painter.setBrush(QColor(200, 10, 10));
 			// int s = e.m_waypoints.size();
 			// if (e.ends_in_stopsign && s > 10) {
@@ -518,6 +532,8 @@ public:
 					painter.setPen(QPen(QColor(200, 10, 10), LANE_WIDTH/2, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
 					painter.drawPoint(wp.painter_x, wp.painter_y);
 				} 
+				// Obstacles
+
 				// else if (wp.type==WP_AVOIDING_OBSTACLE) {
 				// 	painter.setPen(QPen(QColor(0, 10, 100), LANE_WIDTH/2, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
 				// 	painter.drawPoint(wp.painter_x, wp.painter_y);

@@ -61,6 +61,7 @@ struct GameOptions {
     // RG
     int color_theme = 3;
     int color_theme_road = 3;
+    int color_theme_sidewalk = 3;
     int background_noise_level = 100;
 };
 

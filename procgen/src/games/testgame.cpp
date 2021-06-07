@@ -687,6 +687,7 @@ class TestGame : public BasicAbstractGame {
 
         AssetGen bggen(&rand_gen);
         QColor road_color = bggen.get_rand_color(options.color_theme_road);
+        QColor sidewalk_color = bggen.get_rand_color(options.color_theme_sidewalk);
 
           /* initialize random seed: */
         srand (time(NULL));
@@ -701,7 +702,7 @@ class TestGame : public BasicAbstractGame {
 
         front_angle = RAND_ROTATE;
 
-        road_network = RoadNetwork(rand_gen, road_color);
+        road_network = RoadNetwork(rand_gen, road_color, sidewalk_color);
 
         options.center_agent = true;
         options.use_generated_assets = true;

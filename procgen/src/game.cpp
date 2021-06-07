@@ -75,6 +75,10 @@ void Game::parse_options(std::string name, VecOptions opts) {
     opts.consume_int("color_theme_road", &color_theme_road);
     options.color_theme_road = color_theme_road;
 
+    int color_theme_sidewalk = 6;
+    opts.consume_int("color_theme_sidewalk", &color_theme_sidewalk);
+    options.color_theme_sidewalk = color_theme_sidewalk;
+
     int background_noise_level = 6;
     opts.consume_int("background_noise_level", &background_noise_level);
     options.background_noise_level = background_noise_level;
@@ -196,6 +200,7 @@ void Game::serialize(WriteBuffer *b) {
     b->write_int(options.distribution_mode);
     b->write_int(options.color_theme); //
     b->write_int(options.color_theme_road); //
+    b->write_int(options.color_theme_sidewalk); //
     b->write_int(options.background_noise_level);
     b->write_int(options.use_sequential_levels);
 
@@ -264,6 +269,7 @@ void Game::deserialize(ReadBuffer *b) {
     options.distribution_mode = DistributionMode(b->read_int());
     options.color_theme = b->read_int(); //RG 
     options.color_theme_road = b->read_int(); //RG 
+    options.color_theme_sidewalk = b->read_int(); //RG 
     options.background_noise_level = b->read_int();
     options.use_sequential_levels = b->read_int();
 

@@ -224,6 +224,7 @@ class ProcgenGym3Env(BaseProcgenEnv):
         distribution_mode="hard",
         color_theme=[0,1,2,3,4,5,6,7],
         color_theme_road=[0,1,2,3,4,5,6,7],
+        color_theme_sidewalk=[7],
         background_noise_level=100,
         **kwargs,
     ):
@@ -249,6 +250,7 @@ class ProcgenGym3Env(BaseProcgenEnv):
         ltoi = lambda l: int(''.join([str(n) for n in sorted(l, reverse=True)]))
         color_theme = ltoi(color_theme)
         color_theme_road = ltoi(color_theme_road)
+        color_theme_sidewalk = ltoi(color_theme_sidewalk)
 
         options = {
                 "center_agent": bool(center_agent),
@@ -260,6 +262,7 @@ class ProcgenGym3Env(BaseProcgenEnv):
                 "distribution_mode": distribution_mode,
                 "color_theme":color_theme,
                 "color_theme_road":color_theme_road,
+                "color_theme_sidewalk":color_theme_sidewalk,
                 "background_noise_level":background_noise_level,
             }
         super().__init__(num, env_name, options, **kwargs)
