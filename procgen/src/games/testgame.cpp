@@ -30,9 +30,9 @@ const float STEER_NORM = .5;
 const int MIN_NODES_THRESHOLD = 15;
 
 const int NUM_NPCS = 0;//20;
-const bool DRAW_COMPASS = true;
+const bool DRAW_COMPASS = false;
 
-bool USE_AUTOPILOT = true;
+bool USE_AUTOPILOT = false;
 
 class TestGame : public BasicAbstractGame {
   public:
@@ -697,8 +697,8 @@ class TestGame : public BasicAbstractGame {
         actually_randgen.seed(ss);
 
         // This is the line that makes it not learn.
-        //RAND_ROTATE = actually_randgen.randrange(0, 2*PI);
-        RAND_ROTATE = 0; //rand_gen.randrange(0, 2*PI);
+        RAND_ROTATE = 0; 
+        //RAND_ROTATE = rand_gen.randrange(-PI/2, PI/2);
 
         front_angle = RAND_ROTATE;
 
@@ -771,20 +771,7 @@ class TestGame : public BasicAbstractGame {
 
          //ceil((road_network.nodes.size()-1) / .8);
         for (int i = 0; i<NUM_NPCS; i++) {
-
-            brake_npcs.push_back(false);
-            npcs.push_back(std::make_shared<Entity>(0, 0, 0, 0, .4, FISH));
-
-            npcs.at(i)->smart_step = true;
-            npcs.at(i)->render_z = 1;
-            entities.push_back(npcs.at(i));
-
-            current_route_end_node_id_npcs.push_back(road_network.nodes[i%(road_network.nodes.size())].node_id);//road_network.nodes[rand_gen.randn(road_network.nodes.size())].node_id;
-            last_node_id_npcs.push_back(-1); // init to nothin
-
-            std::vector<Waypoint> npc_wps;
-            upcoming_waypoints_npcs.push_back(npc_wps);
-
+//NOTE THIS HAS BEEN REMOVED!!!!
             //upcoming_waypoints_npcs.at(i).clear();
             for (int ii=0; ii < 10; ii++) {
                 add_wps_to_route(upcoming_waypoints_npcs.at(i), last_node_id_npcs.at(i), current_route_end_node_id_npcs.at(i));
@@ -849,7 +836,7 @@ class TestGame : public BasicAbstractGame {
 
 
 
-        *(float_t *)(info_bufs[info_name_to_offset.at("angle_to_wp")]) = (float) angle_to_target_wp; //NOTE THIS HAS BEEN REMOVED!!!!
+        *(float_t *)(info_bufs[info_name_to_offset.at("angle_to_wp")]) = (float) angle_to_target_wp < -.5 ? -1.0 : (angle_to_target_wp > .5 ? 1.0 : 0.0); 
         *(int32_t *)(info_bufs[info_name_to_offset.at("collision")]) = (int) collision;
         *(int32_t *)(info_bufs[info_name_to_offset.at("waypoint_infraction")]) = (int) waypoint_infraction;
 
