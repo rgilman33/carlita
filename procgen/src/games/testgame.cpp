@@ -27,7 +27,7 @@ const float DV_NORM = .05;
 const float THROTTLE_NORM = .05;
 const float STEER_NORM = .5;
 
-const int MIN_NODES_THRESHOLD = 15;
+const int MIN_NODES_THRESHOLD = 5; //15;
 
 const int NUM_NPCS = 0;//20;
 const bool DRAW_COMPASS = false;

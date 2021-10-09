@@ -140,7 +140,7 @@ public:
 	float width = 500.0f;
 	float height = 500.0f;
 
-	float MIN_INTERSECTION_ANGLE = 60.0f;
+	float MIN_INTERSECTION_ANGLE = 80.f; //60.0f;
 	float BASE_EDGE_DISTANCE = width / 8.0f;
 	float MIN_MERGE_DISTANCE = BASE_EDGE_DISTANCE * 1.8f;
 	float MIN_ALLOWABLE_DIST = BASE_EDGE_DISTANCE * 1.f;
