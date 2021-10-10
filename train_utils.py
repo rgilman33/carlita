@@ -98,7 +98,7 @@ class DataLoader:
             front_container[i,:,:,:,:] = img
             targets_container[i,:,0] = np.array([e['autopilot_steer'] for e in info])
             targets_container[i,:,1] = np.array([e['autopilot_throttle'] for e in info])
-            #targets_container[i,:,2] = np.array([e['front_angle'] for e in info])
+            targets_container[i,:,2] = np.array([e['front_angle'] for e in info])
 
             for aux_i, aux_col in enumerate(aux_properties):
                 aux_container[i,:,aux_i] = np.array([e[aux_col] for e in info])
