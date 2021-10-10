@@ -126,7 +126,7 @@ DROP = .20
 N_LSTM_LAYERS = 1
 N_LSTM_HIDDEN = 512
 
-IMG_SZ = 64
+IMG_SZ = 32 #64
 
 class Flatten(nn.Module):
     def forward(self, x):
@@ -153,7 +153,8 @@ class VizCNN(nn.Module):
         self.bn4 = nn.BatchNorm2d(32*scale); self.bn4_ = nn.BatchNorm2d(32*scale)
         self.drop = nn.Dropout(drop)
 
-        n = 5184 + n_aux # flattened CNN activations + aux
+        #n = 5184 + n_aux # flattened CNN activations + aux
+        n = 576 + n_aux # when using 32x32 
 
         self.fc0 = nn.Linear(n, N_LSTM_HIDDEN)
 
@@ -229,10 +230,10 @@ class VizCNN(nn.Module):
 
         x = self.conv_4a(x)
         x = self.bn4(x) if is_src_domain else self.bn4_(x)
-        x = self.pooler(x)
-        x = self.act(x)
+        #x = self.pooler(x) # removing this for 32x32 bc then too few features
+        x = self.act(x) 
 
-        x = Flatten()(x)
+        x = Flatten()(x); #print(x.shape)
         
         features = torch.cat([x, aux], dim=-1); #print(features.shape)
 

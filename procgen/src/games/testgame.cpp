@@ -32,7 +32,7 @@ const int MIN_NODES_THRESHOLD = 5; //15;
 const int NUM_NPCS = 0;//20;
 const bool DRAW_COMPASS = false;
 
-bool USE_AUTOPILOT = true;
+bool USE_AUTOPILOT = false;
 
 class TestGame : public BasicAbstractGame {
   public:
@@ -697,8 +697,8 @@ class TestGame : public BasicAbstractGame {
         actually_randgen.seed(ss);
 
         // This is the line that makes it not learn.
-        //RAND_ROTATE = 0; 
-        RAND_ROTATE = rand_gen.randrange(-PI/2, PI/2);
+        RAND_ROTATE = 0; 
+        //RAND_ROTATE = rand_gen.randrange(-PI/2, PI/2);
 
         front_angle = RAND_ROTATE;
 
