@@ -132,6 +132,7 @@ class TestGame : public BasicAbstractGame {
         bool requires_wp_reset = false;
 
         autopilot_steer = get_autopilot_steer(agent, upcoming_waypoints, last_node_id, current_route_end_node_id, hit_wp, requires_wp_reset);
+
         if (hit_wp){
             wps_visited += 1;
             step_data.reward += 1;
@@ -697,8 +698,8 @@ class TestGame : public BasicAbstractGame {
         actually_randgen.seed(ss);
 
         // This is the line that makes it not learn.
-        RAND_ROTATE = 0; 
-        //RAND_ROTATE = rand_gen.randrange(-PI/2, PI/2);
+        //RAND_ROTATE = 0; 
+        RAND_ROTATE = rand_gen.randrange(-PI, PI);
 
         front_angle = RAND_ROTATE;
 
@@ -837,7 +838,7 @@ class TestGame : public BasicAbstractGame {
 
 
 
-        *(float_t *)(info_bufs[info_name_to_offset.at("angle_to_wp")]) = (float) angle_to_target_wp < -.5 ? -1.0 : (angle_to_target_wp > .5 ? 1.0 : 0.0); 
+        *(float_t *)(info_bufs[info_name_to_offset.at("angle_to_wp")]) = (float) 0.0; //angle_to_target_wp < -.5 ? -1.0 : (angle_to_target_wp > .5 ? 1.0 : 0.0); 
         *(int32_t *)(info_bufs[info_name_to_offset.at("collision")]) = (int) collision;
         *(int32_t *)(info_bufs[info_name_to_offset.at("waypoint_infraction")]) = (int) waypoint_infraction;
 
