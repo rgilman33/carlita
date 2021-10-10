@@ -20,10 +20,10 @@ Base class used for all games, all games must inherit from this
 
 // We want all games to have same observation space. So all these
 // constants here related to observation space are constants forever.
-const int RES_W = 64;
-const int RES_H = 64;
+const int RES_W = 32; //64;
+const int RES_H = 32;// 64;
 
-const int RENDER_RES = 64;
+const int RENDER_RES = 32; //64;
 
 void bgr32_to_rgb888(void *dst_rgb888, void *src_bgr32, int w, int h);
 

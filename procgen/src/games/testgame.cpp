@@ -32,7 +32,7 @@ const int MIN_NODES_THRESHOLD = 5; //15;
 const int NUM_NPCS = 0;//20;
 const bool DRAW_COMPASS = false;
 
-bool USE_AUTOPILOT = false;
+bool USE_AUTOPILOT = true;
 
 class TestGame : public BasicAbstractGame {
   public:
@@ -697,8 +697,8 @@ class TestGame : public BasicAbstractGame {
         actually_randgen.seed(ss);
 
         // This is the line that makes it not learn.
-        RAND_ROTATE = 0; 
-        //RAND_ROTATE = rand_gen.randrange(-PI/2, PI/2);
+        //RAND_ROTATE = 0; 
+        RAND_ROTATE = rand_gen.randrange(-PI/2, PI/2);
 
         front_angle = RAND_ROTATE;
 
@@ -832,7 +832,8 @@ class TestGame : public BasicAbstractGame {
         *(float_t *)(info_bufs[info_name_to_offset.at("current_speed")]) = (float) std::clamp(current_speed, -5.f, 5.f);
         *(float_t *)(info_bufs[info_name_to_offset.at("dv")]) = (float) dv;
 
-        *(float_t *)(info_bufs[info_name_to_offset.at("front_angle")]) = (float) (front_angle); // making it less important in the loss
+        *(float_t *)(info_bufs[info_name_to_offset.at("front_angle")]) = (float) (front_angle); 
+        // making it less important in the loss
 
 
 
